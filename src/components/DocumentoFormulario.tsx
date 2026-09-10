@@ -1,7 +1,8 @@
 import { forwardRef } from "react";
 import { REQUISITOS, TIPOS, PONTUACAO_MAXIMA, somaNotas, type TipoFormulario } from "@/lib/formularios";
 
-type Dados = Record<string, any>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Dados = any;
 
 const linha = "border border-[#10231c]/45";
 
