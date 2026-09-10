@@ -367,7 +367,7 @@ function Fada({ d }: { d: Dados }) {
 
 export const DocumentoFormulario = forwardRef<
   HTMLDivElement,
-  { tipo: TipoFormulario; dados: Dados; registro?: { id: string; created_at: string } }
+  { tipo: TipoFormulario; dados: Dados; registro?: { id: string; created_at: string } | undefined }
 >(function DocumentoFormulario({ tipo, dados, registro }, ref) {
   return (
     <div ref={ref} className="folha-a4">
