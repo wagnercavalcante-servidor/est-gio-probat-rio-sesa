@@ -14,16 +14,145 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      formularios: {
+        Row: {
+          created_at: string
+          created_by: string
+          dados: Json
+          id: string
+          numero_avaliacao: number | null
+          orgao: string | null
+          pontuacao: number | null
+          servidor_matricula: string | null
+          servidor_nome: string
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          dados: Json
+          id?: string
+          numero_avaliacao?: number | null
+          orgao?: string | null
+          pontuacao?: number | null
+          servidor_matricula?: string | null
+          servidor_nome: string
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          dados?: Json
+          id?: string
+          numero_avaliacao?: number | null
+          orgao?: string | null
+          pontuacao?: number | null
+          servidor_matricula?: string | null
+          servidor_nome?: string
+          tipo?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          nome_completo: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          nome_completo?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome_completo?: string | null
+        }
+        Relationships: []
+      }
+      servidores: {
+        Row: {
+          ano_admissao: number | null
+          cargo: string | null
+          created_at: string
+          data_inicio_exercicio: string | null
+          id: string
+          matricula: string
+          mes_admissao: string | null
+          nome: string
+          orgao: string
+          subtipo_vinculo: string | null
+          vinculo: string | null
+        }
+        Insert: {
+          ano_admissao?: number | null
+          cargo?: string | null
+          created_at?: string
+          data_inicio_exercicio?: string | null
+          id?: string
+          matricula: string
+          mes_admissao?: string | null
+          nome: string
+          orgao: string
+          subtipo_vinculo?: string | null
+          vinculo?: string | null
+        }
+        Update: {
+          ano_admissao?: number | null
+          cargo?: string | null
+          created_at?: string
+          data_inicio_exercicio?: string | null
+          id?: string
+          matricula?: string
+          mes_admissao?: string | null
+          nome?: string
+          orgao?: string
+          subtipo_vinculo?: string | null
+          vinculo?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      pode_ver_todos: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "gestao_pessoas" | "comissao" | "avaliador"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +279,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "gestao_pessoas", "comissao", "avaliador"],
+    },
   },
 } as const
