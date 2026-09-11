@@ -16,7 +16,8 @@ type Props = {
   orgao?: string;
   numeroAvaliacao?: number | null;
   pontuacao?: number | null;
-  aoSalvar?: () => void;
+  aoSalvar?: (id: string) => void | Promise<void>;
+  mensagemPosSalvar?: string;
 };
 
 export function AcoesFormulario({
