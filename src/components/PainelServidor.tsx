@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { FormRaep } from "@/components/forms/FormRaep";
 import { baixarPdfPaginaUnica } from "@/lib/pdf";
+import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
+import { useAssinaturas } from "@/hooks/useAssinaturas";
 import { TIPOS } from "@/lib/formularios";
 import {
   COLUNAS_FORMULARIO,
@@ -20,6 +22,7 @@ export function PainelServidor({ userId }: { userId: string }) {
   const [selecionado, setSelecionado] = useState<RegistroFormulario | null>(null);
   const [recurso, setRecurso] = useState<RegistroFormulario | null>(null);
   const referencia = useRef<HTMLDivElement>(null);
+  const { assinaturas, recarregar } = useAssinaturas(selecionado?.id);
 
   const carregar = useCallback(async () => {
     setCarregando(true);
@@ -169,7 +172,14 @@ export function PainelServidor({ userId }: { userId: string }) {
       )}
 
       {selecionado && (
-        <div className="overflow-auto rounded-lg border border-border bg-muted p-4">
+        <div className="space-y-4">
+          <AssinaturaEletronica
+            formularioId={selecionado.id}
+            tipoAssinatura="servidor"
+            assinaturas={assinaturas}
+            aoAssinar={recarregar}
+          />
+          <div className="overflow-auto rounded-lg border border-border bg-muted p-4">
           <div className="mx-auto w-fit shadow-panel">
             <DocumentoFormulario
               ref={referencia}
@@ -178,7 +188,9 @@ export function PainelServidor({ userId }: { userId: string }) {
               revisao={selecionado.dados_revisao ?? undefined}
               homologacao={selecionado.homologacao ?? undefined}
               registro={{ id: selecionado.id, created_at: selecionado.created_at }}
+              assinaturas={assinaturas}
             />
+            </div>
           </div>
         </div>
       )}

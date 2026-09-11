@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Bloco, CampoArea, CampoTexto } from "@/components/Campos";
 import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { TIPOS } from "@/lib/formularios";
+import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
+import { useAssinaturas } from "@/hooks/useAssinaturas";
 import { COLUNAS_FORMULARIO, ROTULO_STATUS, type RegistroFormulario } from "@/lib/fluxo";
 
 const homologacaoInicial = {
@@ -33,6 +35,7 @@ export function PainelComissao() {
   const [h, setH] = useState({ ...homologacaoInicial });
   const [recurso, setRecurso] = useState<RegistroFormulario | null>(null);
   const [salvando, setSalvando] = useState(false);
+  const { assinaturas, recarregar } = useAssinaturas(ativo?.id);
 
   const carregar = useCallback(async () => {
     setCarregando(true);
