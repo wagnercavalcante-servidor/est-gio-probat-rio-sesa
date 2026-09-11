@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { baixarPdfPaginaUnica } from "@/lib/pdf";
-import { TITULOS, type TipoFormulario } from "@/lib/formularios";
+import { TIPOS, type TipoFormulario } from "@/lib/formularios";
 
 type Registro = {
   id: string;
@@ -101,7 +101,7 @@ export function Consulta() {
               <div className="min-w-56 flex-1">
                 <p className="text-sm font-semibold">{r.servidor_nome}</p>
                 <p className="text-xs text-muted-foreground">
-                  {TITULOS[r.tipo]?.sigla ?? r.tipo} · matrícula {r.servidor_matricula ?? "—"} ·{" "}
+                  {TIPOS[r.tipo]?.sigla ?? r.tipo} · matrícula {r.servidor_matricula ?? "—"} ·{" "}
                   {r.numero_avaliacao ? `${r.numero_avaliacao}ª avaliação · ` : ""}
                   {r.pontuacao != null ? `${r.pontuacao} pontos · ` : ""}
                   salvo em {new Date(r.created_at).toLocaleString("pt-BR")}
