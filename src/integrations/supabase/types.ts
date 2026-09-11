@@ -59,18 +59,21 @@ export type Database = {
           email: string | null
           id: string
           nome_completo: string | null
+          orgao: string | null
         }
         Insert: {
           created_at?: string
           email?: string | null
           id: string
           nome_completo?: string | null
+          orgao?: string | null
         }
         Update: {
           created_at?: string
           email?: string | null
           id?: string
           nome_completo?: string | null
+          orgao?: string | null
         }
         Relationships: []
       }
@@ -142,10 +145,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      listar_orgaos: {
+        Args: never
+        Returns: {
+          orgao: string
+        }[]
+      }
     }
     Enums: {
-      app_role: "admin" | "gestao_pessoas" | "comissao" | "avaliador"
+      app_role:
+        | "admin"
+        | "gestao_pessoas"
+        | "comissao"
+        | "avaliador"
+        | "chefia_imediata"
+        | "chefia_mediata"
+        | "par"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -273,7 +288,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "gestao_pessoas", "comissao", "avaliador"],
+      app_role: [
+        "admin",
+        "gestao_pessoas",
+        "comissao",
+        "avaliador",
+        "chefia_imediata",
+        "chefia_mediata",
+        "par",
+      ],
     },
   },
 } as const
