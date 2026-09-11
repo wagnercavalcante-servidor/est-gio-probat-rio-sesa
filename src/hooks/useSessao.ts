@@ -9,7 +9,8 @@ export type Papel =
   | "avaliador"
   | "chefia_imediata"
   | "chefia_mediata"
-  | "par";
+  | "par"
+  | "servidor";
 
 export const ROTULO_PAPEL: Record<Papel, string> = {
   admin: "Administrador",
@@ -19,12 +20,14 @@ export const ROTULO_PAPEL: Record<Papel, string> = {
   gestao_pessoas: "Gestão de Pessoas",
   comissao: "Comissão Setorial",
   avaliador: "Avaliador",
+  servidor: "Servidor avaliado",
 };
 
 export function useSessao() {
   const [sessao, setSessao] = useState<Session | null>(null);
   const [papeis, setPapeis] = useState<Papel[]>([]);
   const [orgao, setOrgao] = useState<string | null>(null);
+  const [matricula, setMatricula] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
@@ -33,11 +36,14 @@ export function useSessao() {
     const carregarPerfil = async (userId: string) => {
       const [{ data: papeisData }, { data: perfil }] = await Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", userId),
-        supabase.from("profiles").select("orgao").eq("id", userId).maybeSingle(),
+        supabase.from("profiles").select("orgao, matricula").eq("id", userId).maybeSingle(),
       ]);
       if (!ativo) return;
       setPapeis((papeisData ?? []).map((r) => r.role as Papel));
-      setOrgao(((perfil as { orgao?: string | null } | null)?.orgao ?? null) || null);
+      const p = perfil as { orgao?: string | null; matricula?: string | null } | null;
+      setOrgao((p?.orgao ?? null) || null);
+      setMatricula((p?.matricula ?? null) || null);
+      void supabase.rpc("expirar_prazos_avaliacao" as never);
     };
 
     supabase.auth.getSession().then(({ data }) => {
@@ -53,6 +59,7 @@ export function useSessao() {
       else {
         setPapeis([]);
         setOrgao(null);
+        setMatricula(null);
       }
     });
 
@@ -62,11 +69,19 @@ export function useSessao() {
     };
   }, []);
 
+  const tem = (...lista: Papel[]) => papeis.some((p) => lista.includes(p));
+
   return {
     sessao,
     papeis,
     orgao,
+    matricula,
     carregando,
-    podeVerTodos: papeis.some((p) => p === "admin" || p === "gestao_pessoas" || p === "comissao"),
+    ehAdmin: tem("admin"),
+    ehServidor: tem("servidor"),
+    ehComissao: tem("comissao"),
+    ehGestaoPessoas: tem("gestao_pessoas"),
+    ehAvaliador: tem("chefia_imediata", "chefia_mediata", "par", "avaliador"),
+    podeVerTodos: tem("admin", "gestao_pessoas", "comissao"),
   };
 }
