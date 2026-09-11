@@ -14,8 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      assinaturas: {
+        Row: {
+          assinado_em: string
+          email: string | null
+          formulario_id: string
+          id: string
+          matricula: string | null
+          nome: string
+          perfil: string | null
+          tipo_assinatura: string
+          user_id: string
+        }
+        Insert: {
+          assinado_em?: string
+          email?: string | null
+          formulario_id: string
+          id?: string
+          matricula?: string | null
+          nome: string
+          perfil?: string | null
+          tipo_assinatura: string
+          user_id: string
+        }
+        Update: {
+          assinado_em?: string
+          email?: string | null
+          formulario_id?: string
+          id?: string
+          matricula?: string | null
+          nome?: string
+          perfil?: string | null
+          tipo_assinatura?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assinaturas_formulario_id_fkey"
+            columns: ["formulario_id"]
+            isOneToOne: false
+            referencedRelation: "formularios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       formularios: {
         Row: {
+          codigo_verificacao: string | null
           created_at: string
           created_by: string
           dados: Json
@@ -40,6 +85,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          codigo_verificacao?: string | null
           created_at?: string
           created_by: string
           dados: Json
@@ -64,6 +110,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          codigo_verificacao?: string | null
           created_at?: string
           created_by?: string
           dados?: Json
@@ -203,6 +250,7 @@ export type Database = {
         Args: { _dias: number; _inicio: string }
         Returns: string
       }
+      verificar_documento: { Args: { _codigo: string }; Returns: Json }
     }
     Enums: {
       app_role:
