@@ -106,17 +106,14 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
             {REQUISITOS.map((req) => (
               <div key={req.id}>
                 <p className="text-xs font-bold uppercase text-foreground">{req.titulo}</p>
-                <p className="mb-2 text-xs text-muted-foreground">{req.descricao}</p>
+                <p className="mb-2 text-justify text-xs text-muted-foreground">{req.descricao}</p>
                 <div className="space-y-3">
                   {req.criterios.map((crit) => (
                     <div key={crit.id} className="rounded-md border border-border p-3">
                       <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-medium">
-                            {crit.id} — {crit.nome}
-                          </p>
-                          <p className="text-xs text-muted-foreground">{crit.descricao}</p>
-                        </div>
+                        <p className="text-sm font-medium">
+                          {crit.id} — {crit.nome}
+                        </p>
                         <div className="w-20 shrink-0">
                           <Label className="text-[10px] uppercase text-muted-foreground">Nota 0-10</Label>
                           <Input
@@ -130,18 +127,28 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
                           />
                         </div>
                       </div>
-                      <CampoArea
-                        rotulo="Considerações / justificativa / feedback"
-                        linhas={2}
-                        valor={d.justificativas[crit.id] ?? ""}
-                        aoMudar={(v) => atualizar(`justificativas.${crit.id}`, v)}
-                        className="mt-2"
-                      />
+                      <div className="mt-2 grid gap-3 md:grid-cols-2">
+                        <div>
+                          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            Descrição
+                          </Label>
+                          <p className="mt-1 rounded-md bg-muted/50 p-2 text-justify text-xs text-muted-foreground">
+                            {crit.descricao}
+                          </p>
+                        </div>
+                        <CampoArea
+                          rotulo="Considerações / justificativa / feedback"
+                          linhas={4}
+                          valor={d.justificativas[crit.id] ?? ""}
+                          aoMudar={(v) => atualizar(`justificativas.${crit.id}`, v)}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
             ))}
+
           </div>
           <p className="mt-4 rounded-md bg-secondary px-3 py-2 text-sm font-semibold text-secondary-foreground">
             Resultado da avaliação parcial: {total} de {PONTUACAO_MAXIMA} pontos (
