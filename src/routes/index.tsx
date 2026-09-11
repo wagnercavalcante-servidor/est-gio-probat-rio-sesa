@@ -3,7 +3,7 @@ import { LogOut, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSessao } from "@/hooks/useSessao";
+import { useSessao, ROTULO_PAPEL } from "@/hooks/useSessao";
 import { TelaLogin } from "@/components/TelaLogin";
 import { Consulta } from "@/components/Consulta";
 import { FormFapep } from "@/components/forms/FormFapep";
@@ -44,7 +44,7 @@ const ABAS = [
 ] as const;
 
 function Pagina() {
-  const { sessao, carregando, papeis } = useSessao();
+  const { sessao, carregando, papeis, orgao } = useSessao();
 
   if (carregando) {
     return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Carregando…</div>;
@@ -65,7 +65,8 @@ function Pagina() {
           </div>
           <div className="text-right text-xs opacity-90">
             <p>{sessao.user.email}</p>
-            <p className="capitalize">{papeis.join(", ").replace(/_/g, " ") || "avaliador"}</p>
+            <p>{papeis.map((p) => ROTULO_PAPEL[p] ?? p).join(", ") || "Avaliador"}</p>
+            {orgao && <p className="opacity-80">{orgao}</p>}
           </div>
           <Button
             variant="secondary"
