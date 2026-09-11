@@ -419,11 +419,19 @@ function Fada({ d }: { d: Dados }) {
 
 export const DocumentoFormulario = forwardRef<
   HTMLDivElement,
-  { tipo: TipoFormulario; dados: Dados; registro?: { id: string; created_at: string } | undefined }
->(function DocumentoFormulario({ tipo, dados, registro }, ref) {
+  {
+    tipo: TipoFormulario;
+    dados: Dados;
+    revisao?: Dados;
+    homologacao?: Dados;
+    registro?: { id: string; created_at: string } | undefined;
+  }
+>(function DocumentoFormulario({ tipo, dados, revisao, homologacao, registro }, ref) {
   return (
     <div ref={ref} className="folha-a4">
-      {tipo === "FAPEP1" || tipo === "FAPEP2" ? <Fapep d={dados} tipo={tipo} /> : null}
+      {tipo === "FAPEP1" || tipo === "FAPEP2" ? (
+        <Fapep d={dados} tipo={tipo} rev={revisao} homologacao={homologacao} />
+      ) : null}
       {tipo === "FAFEP" ? <Fafep d={dados} /> : null}
       {tipo === "RAEP" ? <Raep d={dados} /> : null}
       {tipo === "FADA" ? <Fada d={dados} /> : null}
