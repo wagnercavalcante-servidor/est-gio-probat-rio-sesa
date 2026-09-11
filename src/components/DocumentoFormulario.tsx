@@ -1,5 +1,11 @@
 import { forwardRef } from "react";
 import { REQUISITOS, TIPOS, PONTUACAO_MAXIMA, somaNotas, type TipoFormulario } from "@/lib/formularios";
+import {
+  ROTULO_ASSINATURA,
+  codigoDocumento,
+  formatarDataHora,
+  type Assinatura as AssinaturaRegistro,
+} from "@/lib/assinaturas";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Dados = any;
