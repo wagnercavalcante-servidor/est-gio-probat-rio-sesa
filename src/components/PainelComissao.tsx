@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Bloco, CampoArea, CampoTexto } from "@/components/Campos";
 import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { TIPOS } from "@/lib/formularios";
+import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
+import { useAssinaturas } from "@/hooks/useAssinaturas";
 import { COLUNAS_FORMULARIO, ROTULO_STATUS, type RegistroFormulario } from "@/lib/fluxo";
 
 const homologacaoInicial = {
@@ -33,6 +35,7 @@ export function PainelComissao() {
   const [h, setH] = useState({ ...homologacaoInicial });
   const [recurso, setRecurso] = useState<RegistroFormulario | null>(null);
   const [salvando, setSalvando] = useState(false);
+  const { assinaturas, recarregar } = useAssinaturas(ativo?.id);
 
   const carregar = useCallback(async () => {
     setCarregando(true);
@@ -165,7 +168,13 @@ export function PainelComissao() {
           </Bloco>
         </div>
 
-        <div className="xl:sticky xl:top-6 xl:self-start">
+        <div className="space-y-4 xl:sticky xl:top-6 xl:self-start">
+          <AssinaturaEletronica
+            formularioId={ativo.id}
+            tipoAssinatura="comissao"
+            assinaturas={assinaturas}
+            aoAssinar={recarregar}
+          />
           <div className="overflow-auto rounded-lg border border-border bg-muted p-4">
             <div className="mx-auto w-fit shadow-panel">
               <DocumentoFormulario
@@ -174,6 +183,7 @@ export function PainelComissao() {
                 revisao={ativo.dados_revisao ?? undefined}
                 homologacao={h}
                 registro={{ id: ativo.id, created_at: ativo.created_at }}
+                assinaturas={assinaturas}
               />
             </div>
           </div>

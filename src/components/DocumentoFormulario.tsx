@@ -1,5 +1,11 @@
 import { forwardRef } from "react";
 import { REQUISITOS, TIPOS, PONTUACAO_MAXIMA, somaNotas, type TipoFormulario } from "@/lib/formularios";
+import {
+  ROTULO_ASSINATURA,
+  codigoDocumento,
+  formatarDataHora,
+  type Assinatura as AssinaturaRegistro,
+} from "@/lib/assinaturas";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Dados = any;
@@ -425,8 +431,9 @@ export const DocumentoFormulario = forwardRef<
     revisao?: Dados;
     homologacao?: Dados;
     registro?: { id: string; created_at: string } | undefined;
+    assinaturas?: AssinaturaRegistro[];
   }
->(function DocumentoFormulario({ tipo, dados, revisao, homologacao, registro }, ref) {
+>(function DocumentoFormulario({ tipo, dados, revisao, homologacao, registro, assinaturas = [] }, ref) {
   return (
     <div ref={ref} className="folha-a4">
       {tipo === "FAPEP1" || tipo === "FAPEP2" ? (
@@ -435,10 +442,25 @@ export const DocumentoFormulario = forwardRef<
       {tipo === "FAFEP" ? <Fafep d={dados} /> : null}
       {tipo === "RAEP" ? <Raep d={dados} /> : null}
       {tipo === "FADA" ? <Fada d={dados} /> : null}
+
+      {registro && assinaturas.length > 0 ? (
+        <div className={`${linha} mt-2 px-1.5 py-1 text-[6.5px] leading-snug`}>
+          <p className="font-bold uppercase">Assinaturas eletrônicas</p>
+          {assinaturas.map((a) => (
+            <p key={a.id}>
+              <strong>{a.nome}</strong>
+              {a.matricula ? ` — matrícula ${a.matricula}` : ""} —{" "}
+              {ROTULO_ASSINATURA[a.tipo_assinatura] ?? a.tipo_assinatura} — assinado em{" "}
+              {formatarDataHora(a.assinado_em)}
+            </p>
+          ))}
+        </div>
+      ) : null}
+
       {registro ? (
-        <p className="mt-3 text-center text-[6.5px] text-[#10231c]/60">
-          Documento registrado eletronicamente em {new Date(registro.created_at).toLocaleString("pt-BR")} — código{" "}
-          {registro.id}
+        <p className="mt-2 text-center text-[6.5px] text-[#10231c]/60">
+          Documento registrado eletronicamente em {new Date(registro.created_at).toLocaleString("pt-BR")} — código de
+          verificação <strong>{codigoDocumento(registro.id)}</strong>. Confira a autenticidade em /verificar.
         </p>
       ) : null}
     </div>

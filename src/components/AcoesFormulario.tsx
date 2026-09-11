@@ -5,7 +5,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { baixarPdfPaginaUnica } from "@/lib/pdf";
+import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
+import { useAssinaturas } from "@/hooks/useAssinaturas";
+import type { TipoAssinatura } from "@/lib/assinaturas";
 import type { TipoFormulario } from "@/lib/formularios";
+
+const ASSINATURA_POR_TIPO: Record<TipoFormulario, TipoAssinatura> = {
+  FAPEP1: "chefia_imediata",
+  FAPEP2: "par",
+  FAFEP: "comissao",
+  RAEP: "servidor",
+  FADA: "chefia_imediata",
+};
 
 type Props = {
   tipo: TipoFormulario;
@@ -34,6 +45,7 @@ export function AcoesFormulario({
   const referencia = useRef<HTMLDivElement>(null);
   const [salvando, setSalvando] = useState(false);
   const [registro, setRegistro] = useState<{ id: string; created_at: string } | null>(null);
+  const { assinaturas, recarregar } = useAssinaturas(registro?.id);
 
   const salvar = async () => {
     if (!servidorNome?.trim()) {
@@ -105,6 +117,15 @@ export function AcoesFormulario({
         )}
       </div>
 
+      {registro && (
+        <AssinaturaEletronica
+          formularioId={registro.id}
+          tipoAssinatura={ASSINATURA_POR_TIPO[tipo]}
+          assinaturas={assinaturas}
+          aoAssinar={recarregar}
+        />
+      )}
+
       <div className="overflow-auto rounded-lg border border-border bg-muted p-4">
         <div className="mx-auto w-fit origin-top shadow-panel">
           <DocumentoFormulario
@@ -112,6 +133,7 @@ export function AcoesFormulario({
             tipo={tipo}
             dados={dados}
             registro={registro ?? undefined}
+            assinaturas={assinaturas}
           />
         </div>
       </div>

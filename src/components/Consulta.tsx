@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { baixarPdfPaginaUnica } from "@/lib/pdf";
 import { TIPOS } from "@/lib/formularios";
+import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
+import { useAssinaturas } from "@/hooks/useAssinaturas";
 import { COLUNAS_FORMULARIO, ROTULO_STATUS, type RegistroFormulario } from "@/lib/fluxo";
 
 export function Consulta() {
@@ -15,6 +17,7 @@ export function Consulta() {
   const [carregando, setCarregando] = useState(true);
   const [selecionado, setSelecionado] = useState<RegistroFormulario | null>(null);
   const referencia = useRef<HTMLDivElement>(null);
+  const { assinaturas } = useAssinaturas(selecionado?.id);
 
   const carregar = async () => {
     setCarregando(true);
@@ -108,7 +111,14 @@ export function Consulta() {
       )}
 
       {selecionado && (
-        <div className="overflow-auto rounded-lg border border-border bg-muted p-4">
+        <div className="space-y-4">
+          <AssinaturaEletronica
+            formularioId={selecionado.id}
+            tipoAssinatura="gestao_pessoas"
+            assinaturas={assinaturas}
+            somenteLeitura
+          />
+          <div className="overflow-auto rounded-lg border border-border bg-muted p-4">
           <div className="mx-auto w-fit shadow-panel">
             <DocumentoFormulario
               ref={referencia}
@@ -117,7 +127,9 @@ export function Consulta() {
               revisao={selecionado.dados_revisao ?? undefined}
               homologacao={selecionado.homologacao ?? undefined}
               registro={{ id: selecionado.id, created_at: selecionado.created_at }}
+              assinaturas={assinaturas}
             />
+            </div>
           </div>
         </div>
       )}
