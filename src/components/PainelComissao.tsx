@@ -168,7 +168,13 @@ export function PainelComissao() {
           </Bloco>
         </div>
 
-        <div className="xl:sticky xl:top-6 xl:self-start">
+        <div className="space-y-4 xl:sticky xl:top-6 xl:self-start">
+          <AssinaturaEletronica
+            formularioId={ativo.id}
+            tipoAssinatura="comissao"
+            assinaturas={assinaturas}
+            aoAssinar={recarregar}
+          />
           <div className="overflow-auto rounded-lg border border-border bg-muted p-4">
             <div className="mx-auto w-fit shadow-panel">
               <DocumentoFormulario
@@ -177,6 +183,7 @@ export function PainelComissao() {
                 revisao={ativo.dados_revisao ?? undefined}
                 homologacao={h}
                 registro={{ id: ativo.id, created_at: ativo.created_at }}
+                assinaturas={assinaturas}
               />
             </div>
           </div>
