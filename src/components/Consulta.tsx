@@ -6,33 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { baixarPdfPaginaUnica } from "@/lib/pdf";
-import { TIPOS, type TipoFormulario } from "@/lib/formularios";
-
-type Registro = {
-  id: string;
-  tipo: TipoFormulario;
-  servidor_nome: string;
-  servidor_matricula: string | null;
-  orgao: string | null;
-  numero_avaliacao: number | null;
-  pontuacao: number | null;
-  created_at: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dados: any;
-};
+import { TIPOS } from "@/lib/formularios";
+import { COLUNAS_FORMULARIO, ROTULO_STATUS, type RegistroFormulario } from "@/lib/fluxo";
 
 export function Consulta() {
-  const [registros, setRegistros] = useState<Registro[]>([]);
+  const [registros, setRegistros] = useState<RegistroFormulario[]>([]);
   const [busca, setBusca] = useState("");
   const [carregando, setCarregando] = useState(true);
-  const [selecionado, setSelecionado] = useState<Registro | null>(null);
+  const [selecionado, setSelecionado] = useState<RegistroFormulario | null>(null);
   const referencia = useRef<HTMLDivElement>(null);
 
   const carregar = async () => {
     setCarregando(true);
     let consulta = supabase
       .from("formularios")
-      .select("id, tipo, servidor_nome, servidor_matricula, orgao, numero_avaliacao, pontuacao, created_at, dados")
+      .select(COLUNAS_FORMULARIO)
       .order("created_at", { ascending: false })
       .limit(100);
     if (busca.trim()) {
@@ -44,7 +32,7 @@ export function Consulta() {
       toast.error("Erro ao consultar: " + error.message);
       return;
     }
-    setRegistros((data ?? []) as Registro[]);
+    setRegistros((data ?? []) as unknown as RegistroFormulario[]);
   };
 
   useEffect(() => {
@@ -52,7 +40,7 @@ export function Consulta() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const baixar = async (registro: Registro) => {
+  const baixar = async (registro: RegistroFormulario) => {
     setSelecionado(registro);
     toast.info("Gerando PDF…");
     await new Promise((resolver) => setTimeout(resolver, 400));
@@ -106,6 +94,7 @@ export function Consulta() {
                   {r.pontuacao != null ? `${r.pontuacao} pontos · ` : ""}
                   salvo em {new Date(r.created_at).toLocaleString("pt-BR")}
                 </p>
+                <p className="text-xs font-medium text-primary">{ROTULO_STATUS[r.status] ?? r.status}</p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setSelecionado(r)}>
                 Visualizar
@@ -125,6 +114,8 @@ export function Consulta() {
               ref={referencia}
               tipo={selecionado.tipo}
               dados={selecionado.dados}
+              revisao={selecionado.dados_revisao ?? undefined}
+              homologacao={selecionado.homologacao ?? undefined}
               registro={{ id: selecionado.id, created_at: selecionado.created_at }}
             />
           </div>

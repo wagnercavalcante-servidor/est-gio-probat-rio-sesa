@@ -19,6 +19,7 @@ const PERFIS = [
   { valor: "par", rotulo: "Avaliador (Par)" },
   { valor: "gestao_pessoas", rotulo: "Gestão de Pessoas" },
   { valor: "comissao", rotulo: "Comissão Setorial" },
+  { valor: "servidor", rotulo: "Servidor avaliado (estágio probatório)" },
 ] as const;
 
 export function TelaLogin() {
