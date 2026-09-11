@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatarData } from "@/lib/formularios";
+import { useSessao } from "@/hooks/useSessao";
 
 export type Servidor = {
   id: string;
@@ -18,6 +19,7 @@ export function ServidorSelect({ aoSelecionar }: { aoSelecionar: (s: Servidor) =
   const [termo, setTermo] = useState("");
   const [resultados, setResultados] = useState<Servidor[]>([]);
   const [aberto, setAberto] = useState(false);
+  const { orgao } = useSessao();
 
   useEffect(() => {
     if (termo.trim().length < 3) {
@@ -25,17 +27,17 @@ export function ServidorSelect({ aoSelecionar }: { aoSelecionar: (s: Servidor) =
       return;
     }
     const timer = setTimeout(async () => {
-      const { data } = await supabase
+      let consulta = supabase
         .from("servidores")
         .select("id, nome, matricula, orgao, cargo, data_inicio_exercicio")
-        .or(`nome.ilike.%${termo.trim()}%,matricula.ilike.%${termo.trim()}%`)
-        .order("nome")
-        .limit(12);
+        .or(`nome.ilike.%${termo.trim()}%,matricula.ilike.%${termo.trim()}%`);
+      if (orgao) consulta = consulta.eq("orgao", orgao);
+      const { data } = await consulta.order("nome").limit(12);
       setResultados((data ?? []) as Servidor[]);
       setAberto(true);
     }, 300);
     return () => clearTimeout(timer);
-  }, [termo]);
+  }, [termo, orgao]);
 
   return (
     <div className="relative">
