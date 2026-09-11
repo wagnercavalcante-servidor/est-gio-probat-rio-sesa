@@ -29,6 +29,7 @@ export function TelaLogin() {
   const [nome, setNome] = useState("");
   const [perfil, setPerfil] = useState<string>("");
   const [orgao, setOrgao] = useState<string>("");
+  const [matricula, setMatricula] = useState<string>("");
   const [orgaos, setOrgaos] = useState<string[]>([]);
   const [carregando, setCarregando] = useState(false);
 
@@ -45,6 +46,10 @@ export function TelaLogin() {
       toast.error("Escolha o perfil e o órgão ou entidade.");
       return;
     }
+    if (modo === "criar" && perfil === "servidor" && !matricula.trim()) {
+      toast.error("Informe sua matrícula para receber as avaliações do seu estágio probatório.");
+      return;
+    }
     setCarregando(true);
     if (modo === "entrar") {
       const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
@@ -56,7 +61,7 @@ export function TelaLogin() {
         password: senha,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { nome_completo: nome, perfil, orgao },
+          data: { nome_completo: nome, perfil, orgao, matricula: matricula.trim() },
         },
       });
       setCarregando(false);
