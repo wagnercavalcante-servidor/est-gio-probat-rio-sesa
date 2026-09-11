@@ -83,8 +83,9 @@ function TabelaCriterios({ d }: { d: Dados }) {
     <table className={`${linha} w-full border-collapse text-[7.5px]`}>
       <thead>
         <tr className="bg-[#e8efe9] text-center font-bold uppercase">
-          <th className={`${linha} w-[22%] p-[3px]`}>Requisitos</th>
-          <th className={`${linha} w-[16%] p-[3px]`}>Critérios</th>
+          <th className={`${linha} w-[19%] p-[3px]`}>Requisitos</th>
+          <th className={`${linha} w-[13%] p-[3px]`}>Critérios</th>
+          <th className={`${linha} w-[26%] p-[3px]`}>Descrição</th>
           <th className={`${linha} p-[3px]`}>Considerações / Justificativa / Feedback</th>
           <th className={`${linha} w-[7%] p-[3px]`}>Nota (0 a 10)</th>
           <th className={`${linha} w-[9%] p-[3px]`}>Total / %</th>
@@ -97,18 +98,19 @@ function TabelaCriterios({ d }: { d: Dados }) {
           return req.criterios.map((crit, indice) => (
             <tr key={crit.id} className="align-top">
               {indice === 0 && (
-                <td className={`${linha} p-[3px]`} rowSpan={req.criterios.length}>
+                <td className={`${linha} p-[3px] text-justify`} rowSpan={req.criterios.length}>
                   <strong>{req.titulo}:</strong> {req.descricao}
                 </td>
               )}
               <td className={`${linha} p-[3px]`}>
                 {crit.id} - {crit.nome}
               </td>
-              <td className={`${linha} p-[3px] whitespace-pre-wrap`}>
-                <em className="text-[6.8px] text-[#10231c]/70">{crit.descricao}</em>
-                {justificativas[crit.id] ? <div className="mt-[2px]">{justificativas[crit.id]}</div> : null}
+              <td className={`${linha} p-[3px] text-justify`}>{crit.descricao}</td>
+              <td className={`${linha} p-[3px] whitespace-pre-wrap text-justify`}>
+                {justificativas[crit.id] ?? ""}
               </td>
               <td className={`${linha} p-[3px] text-center font-semibold`}>{notas[crit.id] ?? ""}</td>
+
               {indice === 0 && (
                 <td className={`${linha} p-[3px] text-center font-semibold`} rowSpan={req.criterios.length}>
                   {total} / {req.pontuacaoMaxima}
