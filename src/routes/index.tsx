@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { LogOut, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -86,6 +86,9 @@ function Pagina() {
             <p>{papeis.map((p) => ROTULO_PAPEL[p] ?? p).join(", ") || "Avaliador"}</p>
             {orgao && <p className="opacity-80">{orgao}</p>}
           </div>
+          <Button asChild variant="secondary" size="sm">
+            <Link to="/verificar">Conferir documento</Link>
+          </Button>
           <Button
             variant="secondary"
             size="sm"
