@@ -196,8 +196,14 @@ function Fapep({
         />
       </div>
       <div className="mt-2">
-        <TabelaCriterios d={d} />
+        <TabelaCriterios d={d} rev={rev} />
       </div>
+      {rev ? (
+        <p className="mt-[2px] text-[7px] italic" style={{ color: COR_REVISAO }}>
+          Avaliação revisada pela chefia imediata após pedido de reconsideração do servidor. Os pontos em destaque
+          indicam alterações em relação à avaliação original.
+        </p>
+      ) : null}
       <div className={`${linha} border-t-0 flex justify-between px-1.5 py-[3px] text-[8px] font-bold uppercase`}>
         <span>Pontuação máxima da avaliação parcial (AP): {PONTUACAO_MAXIMA} — 100%</span>
         <span>
@@ -207,16 +213,22 @@ function Fapep({
       <div className="mt-2">
         <Secao>Observações complementares e sugestões para melhoria do desempenho</Secao>
       </div>
-      <div className={`${linha} border-t-0 min-h-[34px] px-1.5 py-1 text-[8px] whitespace-pre-wrap`}>
-        {d.observacoes || ""}
-        {d.sugestoes ? `\n${d.sugestoes}` : ""}
+      <div
+        className={`${linha} border-t-0 min-h-[34px] px-1.5 py-1 text-[8px] whitespace-pre-wrap`}
+        style={rev ? { color: COR_REVISAO } : undefined}
+      >
+        {(rev?.observacoes ?? d.observacoes) || ""}
+        {(rev?.sugestoes ?? d.sugestoes) ? `\n${rev?.sugestoes ?? d.sugestoes}` : ""}
       </div>
       <Assinatura
-        nome={d.avaliador?.nome}
+        nome={(rev?.avaliador ?? d.avaliador)?.nome}
         rotulo={tipo === "FAPEP1" ? "Assinatura do Chefe Imediato" : `Assinatura do Par nº ${d.parNumero || "___"}`}
-        extra={[d.avaliador?.cargo, d.avaliador?.local, d.avaliador?.data].filter(Boolean).join(" — ")}
+        extra={[d.avaliador?.cargo, d.avaliador?.local, rev?.avaliador?.data ?? d.avaliador?.data]
+          .filter(Boolean)
+          .join(" — ")}
       />
-      <BlocoComissao d={d} />
+      <BlocoComissao d={d} homologacao={homologacao} />
+
     </>
   );
 }
