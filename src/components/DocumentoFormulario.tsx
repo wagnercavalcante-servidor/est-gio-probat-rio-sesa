@@ -43,8 +43,8 @@ function Assinatura({ nome, rotulo, extra }: { nome?: string; rotulo: string; ex
   );
 }
 
-function BlocoComissao({ d }: { d: Dados }) {
-  const c = d.comissao ?? {};
+function BlocoComissao({ d, homologacao }: { d: Dados; homologacao?: Dados }) {
+  const c = homologacao ?? d.comissao ?? {};
   return (
     <>
       <div className="mt-2">
@@ -76,9 +76,17 @@ function BlocoComissao({ d }: { d: Dados }) {
   );
 }
 
-function TabelaCriterios({ d }: { d: Dados }) {
+const COR_REVISAO = "#b45309";
+
+function TabelaCriterios({ d, rev }: { d: Dados; rev?: Dados }) {
   const notas = d.notas ?? {};
   const justificativas = d.justificativas ?? {};
+  const notasRev = rev?.notas ?? {};
+  const justRev = rev?.justificativas ?? {};
+  const valorNota = (id: string) => (rev ? (notasRev[id] ?? "") : (notas[id] ?? ""));
+  const valorJust = (id: string) => (rev ? (justRev[id] ?? "") : (justificativas[id] ?? ""));
+  const mudou = (a: unknown, b: unknown) => String(a ?? "") !== String(b ?? "");
+
   return (
     <table className={`${linha} w-full border-collapse text-[7.5px]`}>
       <thead>
@@ -93,33 +101,53 @@ function TabelaCriterios({ d }: { d: Dados }) {
       </thead>
       <tbody>
         {REQUISITOS.map((req) => {
-          const total = req.criterios.reduce((s, c) => s + (Number(notas[c.id]) || 0), 0);
+          const total = req.criterios.reduce((s, c) => s + (Number(valorNota(c.id)) || 0), 0);
           const percentual = Math.round((total / req.pontuacaoMaxima) * 100);
-          return req.criterios.map((crit, indice) => (
-            <tr key={crit.id} className="align-top">
-              {indice === 0 && (
-                <td className={`${linha} p-[3px] text-justify`} rowSpan={req.criterios.length}>
-                  <strong>{req.titulo}:</strong> {req.descricao}
+          return req.criterios.map((crit, indice) => {
+            const notaMudou = rev && mudou(notasRev[crit.id], notas[crit.id]);
+            const justMudou = rev && mudou(justRev[crit.id], justificativas[crit.id]);
+            return (
+              <tr key={crit.id} className="align-top">
+                {indice === 0 && (
+                  <td className={`${linha} p-[3px] text-justify`} rowSpan={req.criterios.length}>
+                    <strong>{req.titulo}:</strong> {req.descricao}
+                  </td>
+                )}
+                <td className={`${linha} p-[3px]`}>
+                  {crit.id} - {crit.nome}
                 </td>
-              )}
-              <td className={`${linha} p-[3px]`}>
-                {crit.id} - {crit.nome}
-              </td>
-              <td className={`${linha} p-[3px] text-justify`}>{crit.descricao}</td>
-              <td className={`${linha} p-[3px] whitespace-pre-wrap text-justify`}>
-                {justificativas[crit.id] ?? ""}
-              </td>
-              <td className={`${linha} p-[3px] text-center font-semibold`}>{notas[crit.id] ?? ""}</td>
+                <td className={`${linha} p-[3px] text-justify`}>{crit.descricao}</td>
+                <td
+                  className={`${linha} p-[3px] whitespace-pre-wrap text-justify`}
+                  style={justMudou ? { color: COR_REVISAO } : undefined}
+                >
+                  {valorJust(crit.id)}
+                  {justMudou ? (
+                    <span className="block text-[6px] italic opacity-80">(texto revisado)</span>
+                  ) : null}
+                </td>
+                <td
+                  className={`${linha} p-[3px] text-center font-semibold`}
+                  style={notaMudou ? { color: COR_REVISAO } : undefined}
+                >
+                  {valorNota(crit.id)}
+                  {notaMudou ? (
+                    <span className="block text-[6px] font-normal line-through opacity-70">
+                      {notas[crit.id] ?? "—"}
+                    </span>
+                  ) : null}
+                </td>
 
-              {indice === 0 && (
-                <td className={`${linha} p-[3px] text-center font-semibold`} rowSpan={req.criterios.length}>
-                  {total} / {req.pontuacaoMaxima}
-                  <br />
-                  {Number.isFinite(percentual) ? percentual : 0}%
-                </td>
-              )}
-            </tr>
-          ));
+                {indice === 0 && (
+                  <td className={`${linha} p-[3px] text-center font-semibold`} rowSpan={req.criterios.length}>
+                    {total} / {req.pontuacaoMaxima}
+                    <br />
+                    {Number.isFinite(percentual) ? percentual : 0}%
+                  </td>
+                )}
+              </tr>
+            );
+          });
         })}
       </tbody>
     </table>
