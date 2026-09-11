@@ -41,7 +41,9 @@ export function ServidorSelect({ aoSelecionar }: { aoSelecionar: (s: Servidor) =
 
   return (
     <div className="relative">
-      <Label htmlFor="busca-servidor">Buscar servidor na base (nome ou matrícula)</Label>
+      <Label htmlFor="busca-servidor">
+        Buscar servidor na base (nome ou matrícula){orgao ? ` — ${orgao}` : ""}
+      </Label>
       <div className="relative mt-1">
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
