@@ -8,9 +8,11 @@ import { TelaLogin } from "@/components/TelaLogin";
 import { Consulta } from "@/components/Consulta";
 import { FormFapep } from "@/components/forms/FormFapep";
 import { FormFafep } from "@/components/forms/FormFafep";
-import { FormRaep } from "@/components/forms/FormRaep";
 import { FormFada } from "@/components/forms/FormFada";
-import { TIPOS } from "@/lib/formularios";
+import { PainelServidor } from "@/components/PainelServidor";
+import { PainelRevisao } from "@/components/PainelRevisao";
+import { PainelComissao } from "@/components/PainelComissao";
+import { TIPOS, type TipoFormulario } from "@/lib/formularios";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -20,12 +22,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Sistema para preenchimento, registro e emissão em PDF dos formulários FAPEP 1, FAPEP 2, FAFEP, RAEP e FADA do estágio probatório.",
+          "Sistema para preenchimento, tramitação e emissão em PDF dos formulários FAPEP 1, FAPEP 2, FAFEP, RAEP e FADA do estágio probatório.",
       },
       { property: "og:title", content: "Avaliação de Estágio Probatório — Decreto 36.773/2025" },
       {
         property: "og:description",
-        content: "Formulários oficiais de avaliação de estágio probatório com registro em banco e PDF em página única.",
+        content:
+          "Formulários oficiais de avaliação de estágio probatório com fluxo de manifestação do servidor, revisão, recurso e homologação.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -34,23 +37,38 @@ export const Route = createFileRoute("/")({
   component: Pagina,
 });
 
-const ABAS = [
-  { valor: "FAPEP1", rotulo: "FAPEP 1 — Chefia" },
-  { valor: "FAPEP2", rotulo: "FAPEP 2 — Pares" },
-  { valor: "FAFEP", rotulo: "FAFEP — Final" },
-  { valor: "RAEP", rotulo: "RAEP — Recurso" },
-  { valor: "FADA", rotulo: "FADA — Atividades" },
-  { valor: "CONSULTA", rotulo: "Consultar salvos" },
-] as const;
-
 function Pagina() {
-  const { sessao, carregando, papeis, orgao } = useSessao();
+  const { sessao, carregando, papeis, orgao, ehAdmin, ehServidor, ehComissao, ehGestaoPessoas, ehAvaliador } =
+    useSessao();
 
   if (carregando) {
     return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Carregando…</div>;
   }
 
   if (!sessao) return <TelaLogin />;
+
+  const abas: { valor: string; rotulo: string }[] = [];
+  if (ehAvaliador || ehAdmin) {
+    abas.push(
+      { valor: "FAPEP1", rotulo: "FAPEP 1 — Chefia" },
+      { valor: "FAPEP2", rotulo: "FAPEP 2 — Pares" },
+      { valor: "FADA", rotulo: "FADA — Atividades" },
+      { valor: "REVISAO", rotulo: "Revisões pendentes" },
+    );
+  }
+  if (ehServidor || ehAdmin) abas.push({ valor: "MINHAS", rotulo: "Minhas avaliações" });
+  if (ehComissao || ehAdmin) {
+    abas.push(
+      { valor: "HOMOLOGAR", rotulo: "Homologações" },
+      { valor: "FAFEP", rotulo: "FAFEP — Final" },
+    );
+  }
+  abas.push({ valor: "CONSULTA", rotulo: ehGestaoPessoas ? "Formulários (somente leitura)" : "Consultar salvos" });
+
+  const abaInicial = abas[0]?.valor ?? "CONSULTA";
+  const formulariosProprios = (["FAPEP1", "FAPEP2", "FADA", "FAFEP"] as const).filter((t) =>
+    abas.some((a) => a.valor === t),
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,16 +99,16 @@ function Pagina() {
       </header>
 
       <main className="mx-auto max-w-[1500px] px-6 py-6">
-        <Tabs defaultValue="FAPEP1">
+        <Tabs defaultValue={abaInicial}>
           <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
-            {ABAS.map((aba) => (
+            {abas.map((aba) => (
               <TabsTrigger key={aba.valor} value={aba.valor} className="text-xs sm:text-sm">
                 {aba.rotulo}
               </TabsTrigger>
             ))}
           </TabsList>
 
-          {(["FAPEP1", "FAPEP2", "FAFEP", "RAEP", "FADA"] as const).map((tipo) => (
+          {formulariosProprios.map((tipo: TipoFormulario) => (
             <TabsContent key={tipo} value={tipo} className="mt-5">
               <p className="mb-4 rounded-lg border border-border bg-card p-4 text-xs leading-relaxed text-muted-foreground">
                 <strong className="text-foreground">{TIPOS[tipo].anexo}</strong> — {TIPOS[tipo].titulo}
@@ -99,15 +117,37 @@ function Pagina() {
                 <FormFapep key={tipo} tipo={tipo} />
               ) : tipo === "FAFEP" ? (
                 <FormFafep />
-              ) : tipo === "RAEP" ? (
-                <FormRaep />
               ) : (
                 <FormFada />
               )}
             </TabsContent>
           ))}
 
+          {(ehAvaliador || ehAdmin) && (
+            <TabsContent value="REVISAO" className="mt-5">
+              <PainelRevisao userId={sessao.user.id} />
+            </TabsContent>
+          )}
+
+          {(ehServidor || ehAdmin) && (
+            <TabsContent value="MINHAS" className="mt-5">
+              <PainelServidor userId={sessao.user.id} />
+            </TabsContent>
+          )}
+
+          {(ehComissao || ehAdmin) && (
+            <TabsContent value="HOMOLOGAR" className="mt-5">
+              <PainelComissao />
+            </TabsContent>
+          )}
+
           <TabsContent value="CONSULTA" className="mt-5">
+            {ehGestaoPessoas && !ehAdmin && (
+              <p className="mb-4 rounded-lg border border-border bg-card p-4 text-xs text-muted-foreground">
+                Perfil Gestão de Pessoas: os formulários FAPEP 1 e 2 são exibidos por completo, apenas para consulta e
+                download, sem possibilidade de edição.
+              </p>
+            )}
             <Consulta />
           </TabsContent>
         </Tabs>

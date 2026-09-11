@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { Bloco, CampoArea, CampoTexto } from "@/components/Campos";
 import { ServidorSelect, type Servidor } from "@/components/ServidorSelect";
 import { AcoesFormulario } from "@/components/AcoesFormulario";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
 
 const estadoInicial = {
   comissaoDestino: "Setorial",
@@ -17,19 +19,51 @@ const estadoInicial = {
   data: "",
 };
 
-export function FormRaep() {
-  const [d, setD] = useState({ ...estadoInicial });
+export type VinculoRecurso = {
+  formularioId: string;
+  nome: string;
+  matricula: string;
+  orgao: string;
+  descricao: string;
+};
+
+export function FormRaep({ vinculo, aoConcluir }: { vinculo?: VinculoRecurso; aoConcluir?: () => void }) {
+  const [d, setD] = useState({
+    ...estadoInicial,
+    ...(vinculo
+      ? {
+          nome: vinculo.nome,
+          matricula: vinculo.matricula,
+          orgao: vinculo.orgao,
+          avaliacaoObjeto: vinculo.descricao,
+        }
+      : {}),
+  });
   const atualizar = (campo: keyof typeof estadoInicial, valor: string) =>
     setD((a) => ({ ...a, [campo]: valor }));
 
   const selecionarServidor = (s: Servidor) =>
     setD((a) => ({ ...a, nome: s.nome, matricula: s.matricula, cargo: s.cargo ?? "", orgao: s.orgao }));
 
+  const vincularAoFormulario = async (idRecurso: string) => {
+    if (!vinculo) return;
+    const { error } = await supabase
+      .from("formularios")
+      .update({ status: "recurso_apresentado", raep_formulario_id: idRecurso })
+      .eq("id", vinculo.formularioId);
+    if (error) {
+      toast.error("Recurso salvo, mas não foi possível vinculá-lo à avaliação: " + error.message);
+      return;
+    }
+    toast.success("Recurso enviado à Comissão Setorial.");
+    aoConcluir?.();
+  };
+
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="space-y-5">
         <Bloco titulo="Identificação do servidor recorrente">
-          <ServidorSelect aoSelecionar={selecionarServidor} />
+          {!vinculo && <ServidorSelect aoSelecionar={selecionarServidor} />}
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <CampoTexto rotulo="Nome completo" valor={d.nome} aoMudar={(v) => atualizar("nome", v)} />
             <CampoTexto rotulo="Matrícula" valor={d.matricula} aoMudar={(v) => atualizar("matricula", v)} />
@@ -86,6 +120,10 @@ export function FormRaep() {
           servidorNome={d.nome}
           servidorMatricula={d.matricula}
           orgao={d.orgao}
+          {...(vinculo ? { aoSalvar: vincularAoFormulario } : {})}
+          {...(vinculo
+            ? { mensagemPosSalvar: "Recurso registrado e encaminhado à Comissão Setorial." }
+            : {})}
         />
       </div>
     </div>

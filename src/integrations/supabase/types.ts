@@ -19,45 +19,90 @@ export type Database = {
           created_at: string
           created_by: string
           dados: Json
+          dados_revisao: Json | null
+          homologacao: Json | null
+          homologado_em: string | null
+          homologado_por: string | null
           id: string
           numero_avaliacao: number | null
           orgao: string | null
           pontuacao: number | null
+          prazo_resposta: string | null
+          raep_formulario_id: string | null
+          resposta_em: string | null
+          resposta_servidor: string | null
+          revisado_em: string | null
           servidor_matricula: string | null
           servidor_nome: string
+          servidor_user_id: string | null
+          status: string
           tipo: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
           created_by: string
           dados: Json
+          dados_revisao?: Json | null
+          homologacao?: Json | null
+          homologado_em?: string | null
+          homologado_por?: string | null
           id?: string
           numero_avaliacao?: number | null
           orgao?: string | null
           pontuacao?: number | null
+          prazo_resposta?: string | null
+          raep_formulario_id?: string | null
+          resposta_em?: string | null
+          resposta_servidor?: string | null
+          revisado_em?: string | null
           servidor_matricula?: string | null
           servidor_nome: string
+          servidor_user_id?: string | null
+          status?: string
           tipo: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
           created_by?: string
           dados?: Json
+          dados_revisao?: Json | null
+          homologacao?: Json | null
+          homologado_em?: string | null
+          homologado_por?: string | null
           id?: string
           numero_avaliacao?: number | null
           orgao?: string | null
           pontuacao?: number | null
+          prazo_resposta?: string | null
+          raep_formulario_id?: string | null
+          resposta_em?: string | null
+          resposta_servidor?: string | null
+          revisado_em?: string | null
           servidor_matricula?: string | null
           servidor_nome?: string
+          servidor_user_id?: string | null
+          status?: string
           tipo?: string
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "formularios_raep_formulario_id_fkey"
+            columns: ["raep_formulario_id"]
+            isOneToOne: false
+            referencedRelation: "formularios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
           created_at: string
           email: string | null
           id: string
+          matricula: string | null
           nome_completo: string | null
           orgao: string | null
         }
@@ -65,6 +110,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id: string
+          matricula?: string | null
           nome_completo?: string | null
           orgao?: string | null
         }
@@ -72,6 +118,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          matricula?: string | null
           nome_completo?: string | null
           orgao?: string | null
         }
@@ -145,11 +192,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      expirar_prazos_avaliacao: { Args: never; Returns: undefined }
       listar_orgaos: {
         Args: never
         Returns: {
           orgao: string
         }[]
+      }
+      prazo_dias_uteis: {
+        Args: { _dias: number; _inicio: string }
+        Returns: string
       }
     }
     Enums: {
@@ -161,6 +213,7 @@ export type Database = {
         | "chefia_imediata"
         | "chefia_mediata"
         | "par"
+        | "servidor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -296,6 +349,7 @@ export const Constants = {
         "chefia_imediata",
         "chefia_mediata",
         "par",
+        "servidor",
       ],
     },
   },

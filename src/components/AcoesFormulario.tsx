@@ -16,7 +16,8 @@ type Props = {
   orgao?: string;
   numeroAvaliacao?: number | null;
   pontuacao?: number | null;
-  aoSalvar?: () => void;
+  aoSalvar?: (id: string) => void | Promise<void>;
+  mensagemPosSalvar?: string;
 };
 
 export function AcoesFormulario({
@@ -28,6 +29,7 @@ export function AcoesFormulario({
   numeroAvaliacao,
   pontuacao,
   aoSalvar,
+  mensagemPosSalvar,
 }: Props) {
   const referencia = useRef<HTMLDivElement>(null);
   const [salvando, setSalvando] = useState(false);
@@ -65,8 +67,8 @@ export function AcoesFormulario({
       return;
     }
     setRegistro(data);
-    aoSalvar?.();
-    toast.success("Formulário salvo. Ele não pode mais ser alterado.");
+    await aoSalvar?.(data.id);
+    toast.success(mensagemPosSalvar ?? "Formulário salvo. Ele não pode mais ser alterado.");
   };
 
   const baixar = async () => {

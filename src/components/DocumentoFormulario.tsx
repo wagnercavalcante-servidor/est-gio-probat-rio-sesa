@@ -43,8 +43,8 @@ function Assinatura({ nome, rotulo, extra }: { nome?: string; rotulo: string; ex
   );
 }
 
-function BlocoComissao({ d }: { d: Dados }) {
-  const c = d.comissao ?? {};
+function BlocoComissao({ d, homologacao }: { d: Dados; homologacao?: Dados }) {
+  const c = homologacao ?? d.comissao ?? {};
   return (
     <>
       <div className="mt-2">
@@ -76,9 +76,17 @@ function BlocoComissao({ d }: { d: Dados }) {
   );
 }
 
-function TabelaCriterios({ d }: { d: Dados }) {
+const COR_REVISAO = "#b45309";
+
+function TabelaCriterios({ d, rev }: { d: Dados; rev?: Dados }) {
   const notas = d.notas ?? {};
   const justificativas = d.justificativas ?? {};
+  const notasRev = rev?.notas ?? {};
+  const justRev = rev?.justificativas ?? {};
+  const valorNota = (id: string) => (rev ? (notasRev[id] ?? "") : (notas[id] ?? ""));
+  const valorJust = (id: string) => (rev ? (justRev[id] ?? "") : (justificativas[id] ?? ""));
+  const mudou = (a: unknown, b: unknown) => String(a ?? "") !== String(b ?? "");
+
   return (
     <table className={`${linha} w-full border-collapse text-[7.5px]`}>
       <thead>
@@ -93,42 +101,72 @@ function TabelaCriterios({ d }: { d: Dados }) {
       </thead>
       <tbody>
         {REQUISITOS.map((req) => {
-          const total = req.criterios.reduce((s, c) => s + (Number(notas[c.id]) || 0), 0);
+          const total = req.criterios.reduce((s, c) => s + (Number(valorNota(c.id)) || 0), 0);
           const percentual = Math.round((total / req.pontuacaoMaxima) * 100);
-          return req.criterios.map((crit, indice) => (
-            <tr key={crit.id} className="align-top">
-              {indice === 0 && (
-                <td className={`${linha} p-[3px] text-justify`} rowSpan={req.criterios.length}>
-                  <strong>{req.titulo}:</strong> {req.descricao}
+          return req.criterios.map((crit, indice) => {
+            const notaMudou = rev && mudou(notasRev[crit.id], notas[crit.id]);
+            const justMudou = rev && mudou(justRev[crit.id], justificativas[crit.id]);
+            return (
+              <tr key={crit.id} className="align-top">
+                {indice === 0 && (
+                  <td className={`${linha} p-[3px] text-justify`} rowSpan={req.criterios.length}>
+                    <strong>{req.titulo}:</strong> {req.descricao}
+                  </td>
+                )}
+                <td className={`${linha} p-[3px]`}>
+                  {crit.id} - {crit.nome}
                 </td>
-              )}
-              <td className={`${linha} p-[3px]`}>
-                {crit.id} - {crit.nome}
-              </td>
-              <td className={`${linha} p-[3px] text-justify`}>{crit.descricao}</td>
-              <td className={`${linha} p-[3px] whitespace-pre-wrap text-justify`}>
-                {justificativas[crit.id] ?? ""}
-              </td>
-              <td className={`${linha} p-[3px] text-center font-semibold`}>{notas[crit.id] ?? ""}</td>
+                <td className={`${linha} p-[3px] text-justify`}>{crit.descricao}</td>
+                <td
+                  className={`${linha} p-[3px] whitespace-pre-wrap text-justify`}
+                  style={justMudou ? { color: COR_REVISAO } : undefined}
+                >
+                  {valorJust(crit.id)}
+                  {justMudou ? (
+                    <span className="block text-[6px] italic opacity-80">(texto revisado)</span>
+                  ) : null}
+                </td>
+                <td
+                  className={`${linha} p-[3px] text-center font-semibold`}
+                  style={notaMudou ? { color: COR_REVISAO } : undefined}
+                >
+                  {valorNota(crit.id)}
+                  {notaMudou ? (
+                    <span className="block text-[6px] font-normal line-through opacity-70">
+                      {notas[crit.id] ?? "—"}
+                    </span>
+                  ) : null}
+                </td>
 
-              {indice === 0 && (
-                <td className={`${linha} p-[3px] text-center font-semibold`} rowSpan={req.criterios.length}>
-                  {total} / {req.pontuacaoMaxima}
-                  <br />
-                  {Number.isFinite(percentual) ? percentual : 0}%
-                </td>
-              )}
-            </tr>
-          ));
+                {indice === 0 && (
+                  <td className={`${linha} p-[3px] text-center font-semibold`} rowSpan={req.criterios.length}>
+                    {total} / {req.pontuacaoMaxima}
+                    <br />
+                    {Number.isFinite(percentual) ? percentual : 0}%
+                  </td>
+                )}
+              </tr>
+            );
+          });
         })}
       </tbody>
     </table>
   );
 }
 
-function Fapep({ d, tipo }: { d: Dados; tipo: TipoFormulario }) {
+function Fapep({
+  d,
+  tipo,
+  rev,
+  homologacao,
+}: {
+  d: Dados;
+  tipo: TipoFormulario;
+  rev?: Dados;
+  homologacao?: Dados;
+}) {
   const id = d.identificacao ?? {};
-  const total = somaNotas(d.notas ?? {});
+  const total = somaNotas((rev?.notas ?? d.notas) ?? {});
   return (
     <>
       <Titulo tipo={tipo} />
@@ -158,8 +196,14 @@ function Fapep({ d, tipo }: { d: Dados; tipo: TipoFormulario }) {
         />
       </div>
       <div className="mt-2">
-        <TabelaCriterios d={d} />
+        <TabelaCriterios d={d} rev={rev} />
       </div>
+      {rev ? (
+        <p className="mt-[2px] text-[7px] italic" style={{ color: COR_REVISAO }}>
+          Avaliação revisada pela chefia imediata após pedido de reconsideração do servidor. Os pontos em destaque
+          indicam alterações em relação à avaliação original.
+        </p>
+      ) : null}
       <div className={`${linha} border-t-0 flex justify-between px-1.5 py-[3px] text-[8px] font-bold uppercase`}>
         <span>Pontuação máxima da avaliação parcial (AP): {PONTUACAO_MAXIMA} — 100%</span>
         <span>
@@ -169,16 +213,22 @@ function Fapep({ d, tipo }: { d: Dados; tipo: TipoFormulario }) {
       <div className="mt-2">
         <Secao>Observações complementares e sugestões para melhoria do desempenho</Secao>
       </div>
-      <div className={`${linha} border-t-0 min-h-[34px] px-1.5 py-1 text-[8px] whitespace-pre-wrap`}>
-        {d.observacoes || ""}
-        {d.sugestoes ? `\n${d.sugestoes}` : ""}
+      <div
+        className={`${linha} border-t-0 min-h-[34px] px-1.5 py-1 text-[8px] whitespace-pre-wrap`}
+        style={rev ? { color: COR_REVISAO } : undefined}
+      >
+        {(rev?.observacoes ?? d.observacoes) || ""}
+        {(rev?.sugestoes ?? d.sugestoes) ? `\n${rev?.sugestoes ?? d.sugestoes}` : ""}
       </div>
       <Assinatura
-        nome={d.avaliador?.nome}
+        nome={(rev?.avaliador ?? d.avaliador)?.nome}
         rotulo={tipo === "FAPEP1" ? "Assinatura do Chefe Imediato" : `Assinatura do Par nº ${d.parNumero || "___"}`}
-        extra={[d.avaliador?.cargo, d.avaliador?.local, d.avaliador?.data].filter(Boolean).join(" — ")}
+        extra={[d.avaliador?.cargo, d.avaliador?.local, rev?.avaliador?.data ?? d.avaliador?.data]
+          .filter(Boolean)
+          .join(" — ")}
       />
-      <BlocoComissao d={d} />
+      <BlocoComissao d={d} homologacao={homologacao} />
+
     </>
   );
 }
@@ -369,11 +419,19 @@ function Fada({ d }: { d: Dados }) {
 
 export const DocumentoFormulario = forwardRef<
   HTMLDivElement,
-  { tipo: TipoFormulario; dados: Dados; registro?: { id: string; created_at: string } | undefined }
->(function DocumentoFormulario({ tipo, dados, registro }, ref) {
+  {
+    tipo: TipoFormulario;
+    dados: Dados;
+    revisao?: Dados;
+    homologacao?: Dados;
+    registro?: { id: string; created_at: string } | undefined;
+  }
+>(function DocumentoFormulario({ tipo, dados, revisao, homologacao, registro }, ref) {
   return (
     <div ref={ref} className="folha-a4">
-      {tipo === "FAPEP1" || tipo === "FAPEP2" ? <Fapep d={dados} tipo={tipo} /> : null}
+      {tipo === "FAPEP1" || tipo === "FAPEP2" ? (
+        <Fapep d={dados} tipo={tipo} rev={revisao} homologacao={homologacao} />
+      ) : null}
       {tipo === "FAFEP" ? <Fafep d={dados} /> : null}
       {tipo === "RAEP" ? <Raep d={dados} /> : null}
       {tipo === "FADA" ? <Fada d={dados} /> : null}

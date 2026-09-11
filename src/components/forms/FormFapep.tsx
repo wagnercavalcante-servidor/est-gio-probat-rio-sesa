@@ -17,22 +17,6 @@ const estadoInicial = {
   observacoes: "",
   sugestoes: "",
   avaliador: { nome: "", cargo: "", local: "", data: "" },
-  comissao: {
-    discorda: "nao",
-    fundamentacao: "",
-    nota: "",
-    percentual: "",
-    portaria: "",
-    portariaData: "",
-    local: "",
-    data: "",
-    presidente: "",
-    presidenteCargo: "",
-    membro1: "",
-    membro1Cargo: "",
-    membro2: "",
-    membro2Cargo: "",
-  },
 };
 
 export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
@@ -173,47 +157,11 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
           </div>
         </Bloco>
 
-        <Bloco titulo="Comissão Setorial de Avaliação Especial">
-          <div className="grid gap-3">
-            <div>
-              <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                A Comissão discorda de alguma nota parcial?
-              </Label>
-              <div className="mt-2 flex gap-4 text-sm">
-                {["nao", "sim"].map((opcao) => (
-                  <label key={opcao} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="discorda"
-                      checked={d.comissao.discorda === opcao}
-                      onChange={() => atualizar("comissao.discorda", opcao)}
-                    />
-                    {opcao === "nao" ? "Não" : "Sim"}
-                  </label>
-                ))}
-              </div>
-            </div>
-            <CampoArea
-              rotulo="Fundamentação e novas notas (§ 2º do art. 25)"
-              valor={d.comissao.fundamentacao}
-              aoMudar={(v) => atualizar("comissao.fundamentacao", v)}
-            />
-            <div className="grid gap-3 sm:grid-cols-2">
-              <CampoTexto rotulo="Nota atribuída pela Comissão (pontos)" valor={d.comissao.nota} aoMudar={(v) => atualizar("comissao.nota", v)} />
-              <CampoTexto rotulo="Percentual (%)" valor={d.comissao.percentual} aoMudar={(v) => atualizar("comissao.percentual", v)} />
-              <CampoTexto rotulo="Portaria nº" valor={d.comissao.portaria} aoMudar={(v) => atualizar("comissao.portaria", v)} />
-              <CampoTexto rotulo="Data da portaria" valor={d.comissao.portariaData} aoMudar={(v) => atualizar("comissao.portariaData", v)} />
-              <CampoTexto rotulo="Local" valor={d.comissao.local} aoMudar={(v) => atualizar("comissao.local", v)} />
-              <CampoTexto rotulo="Data" valor={d.comissao.data} aoMudar={(v) => atualizar("comissao.data", v)} />
-              <CampoTexto rotulo="Presidente da Comissão" valor={d.comissao.presidente} aoMudar={(v) => atualizar("comissao.presidente", v)} />
-              <CampoTexto rotulo="Cargo/função do presidente" valor={d.comissao.presidenteCargo} aoMudar={(v) => atualizar("comissao.presidenteCargo", v)} />
-              <CampoTexto rotulo="Membro 1" valor={d.comissao.membro1} aoMudar={(v) => atualizar("comissao.membro1", v)} />
-              <CampoTexto rotulo="Cargo/função do membro 1" valor={d.comissao.membro1Cargo} aoMudar={(v) => atualizar("comissao.membro1Cargo", v)} />
-              <CampoTexto rotulo="Membro 2" valor={d.comissao.membro2} aoMudar={(v) => atualizar("comissao.membro2", v)} />
-              <CampoTexto rotulo="Cargo/função do membro 2" valor={d.comissao.membro2Cargo} aoMudar={(v) => atualizar("comissao.membro2Cargo", v)} />
-            </div>
-          </div>
-        </Bloco>
+        <p className="rounded-lg border border-dashed border-border p-4 text-xs leading-relaxed text-muted-foreground">
+          O preenchimento vai até a assinatura do avaliador. Depois de salvar, o servidor avaliado é notificado e tem
+          3 dias úteis para concordar ou pedir reconsideração. A parte da Comissão Setorial de Avaliação Especial é
+          preenchida pela própria comissão, na etapa de homologação.
+        </p>
       </div>
 
       <div className="xl:sticky xl:top-6 xl:self-start">
@@ -225,6 +173,7 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
           orgao={d.identificacao.orgao}
           numeroAvaliacao={d.numeroAvaliacao ? Number(d.numeroAvaliacao) : null}
           pontuacao={total}
+          mensagemPosSalvar="Avaliação registrada. O servidor avaliado foi notificado e tem 3 dias úteis para se manifestar."
         />
       </div>
     </div>
