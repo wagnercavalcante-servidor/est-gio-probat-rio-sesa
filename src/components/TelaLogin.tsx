@@ -132,6 +132,20 @@ export function TelaLogin() {
                   As buscas de servidores ficarão restritas ao órgão escolhido.
                 </p>
               </div>
+              {perfil === "servidor" && (
+                <div>
+                  <Label htmlFor="matricula">Matrícula</Label>
+                  <Input
+                    id="matricula"
+                    value={matricula}
+                    onChange={(e) => setMatricula(e.target.value)}
+                    className="mt-1"
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    A matrícula liga sua conta às avaliações do seu estágio probatório.
+                  </p>
+                </div>
+              )}
             </>
           )}
           <div>
