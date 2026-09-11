@@ -154,9 +154,19 @@ function TabelaCriterios({ d, rev }: { d: Dados; rev?: Dados }) {
   );
 }
 
-function Fapep({ d, tipo }: { d: Dados; tipo: TipoFormulario }) {
+function Fapep({
+  d,
+  tipo,
+  rev,
+  homologacao,
+}: {
+  d: Dados;
+  tipo: TipoFormulario;
+  rev?: Dados;
+  homologacao?: Dados;
+}) {
   const id = d.identificacao ?? {};
-  const total = somaNotas(d.notas ?? {});
+  const total = somaNotas((rev?.notas ?? d.notas) ?? {});
   return (
     <>
       <Titulo tipo={tipo} />
