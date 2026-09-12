@@ -8,7 +8,7 @@ import { baixarPdfPaginaUnica } from "@/lib/pdf";
 import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
 import { useAssinaturas } from "@/hooks/useAssinaturas";
 import type { TipoAssinatura } from "@/lib/assinaturas";
-import type { TipoFormulario } from "@/lib/formularios";
+import { pendenciasFapep, type TipoFormulario } from "@/lib/formularios";
 
 const ASSINATURA_POR_TIPO: Record<TipoFormulario, TipoAssinatura> = {
   FAPEP1: "chefia_imediata",
@@ -47,9 +47,17 @@ export function AcoesFormulario({
   const [registro, setRegistro] = useState<{ id: string; created_at: string } | null>(null);
   const { assinaturas, recarregar } = useAssinaturas(registro?.id);
 
+  const pendencias =
+    tipo === "FAPEP1" || tipo === "FAPEP2" ? pendenciasFapep(dados, tipo) : [];
+  const completo = pendencias.length === 0;
+
   const salvar = async () => {
     if (!servidorNome?.trim()) {
       toast.error("Informe o nome do servidor avaliado antes de salvar.");
+      return;
+    }
+    if (!completo) {
+      toast.error("Preencha todos os campos obrigatórios antes de salvar.");
       return;
     }
     setSalvando(true);
@@ -100,7 +108,7 @@ export function AcoesFormulario({
             <span className="flex items-center gap-2 text-sm font-medium text-primary">
               <Lock className="size-4" /> Salvo em {new Date(registro.created_at).toLocaleString("pt-BR")}
             </span>
-            <Button onClick={baixar} className="ml-auto">
+            <Button onClick={baixar} disabled={!completo} className="ml-auto">
               <Download className="size-4" /> Baixar PDF (página única)
             </Button>
           </>
@@ -109,7 +117,7 @@ export function AcoesFormulario({
             <p className="text-sm text-muted-foreground">
               Confira a pré-visualização abaixo. Após salvar, o formulário fica registrado e não poderá ser alterado.
             </p>
-            <Button onClick={salvar} disabled={salvando} className="ml-auto">
+            <Button onClick={salvar} disabled={salvando || !completo} className="ml-auto">
               {salvando ? <Loader2 className="size-4 animate-spin" /> : <FileCheck2 className="size-4" />}
               Salvar definitivamente
             </Button>
@@ -117,7 +125,21 @@ export function AcoesFormulario({
         )}
       </div>
 
-      {registro && (
+      {!completo && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive">
+          <p className="font-semibold">
+            Para salvar, assinar e baixar o PDF, complete a avaliação. Só o campo “Considerações / justificativa /
+            feedback” é opcional. Faltam:
+          </p>
+          <ul className="mt-1 list-disc pl-4">
+            {pendencias.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {registro && completo && (
         <AssinaturaEletronica
           formularioId={registro.id}
           tipoAssinatura={ASSINATURA_POR_TIPO[tipo]}

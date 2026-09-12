@@ -162,6 +162,47 @@ export function somaNotas(notas: Record<string, string | number | undefined>): n
   }, 0);
 }
 
+/**
+ * Verifica se um FAPEP 1/2 está completo. A única parte opcional é
+ * "Considerações / justificativa / feedback".
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function pendenciasFapep(d: any, tipo: "FAPEP1" | "FAPEP2"): string[] {
+  const faltando: string[] = [];
+  const id = d?.identificacao ?? {};
+  const obrigatoriosId: [string, string][] = [
+    ["nome", "Nome do servidor"],
+    ["matricula", "Matrícula"],
+    ["ato", "Ato de nomeação"],
+    ["dataInicio", "Data do início do exercício"],
+    ["cargo", "Cargo"],
+    ["orgao", "Órgão/Entidade"],
+    ["setor", "Setor"],
+  ];
+  for (const [chave, rotulo] of obrigatoriosId) {
+    if (!String(id[chave] ?? "").trim()) faltando.push(rotulo);
+  }
+  if (!String(d?.numeroAvaliacao ?? "").trim()) faltando.push("Número da avaliação");
+  if (!String(d?.periodoInicio ?? "").trim()) faltando.push("Período de");
+  if (!String(d?.periodoFim ?? "").trim()) faltando.push("Período até");
+  if (tipo === "FAPEP2" && !String(d?.parNumero ?? "").trim()) faltando.push("Par nº");
+
+  const semNota = TODOS_CRITERIOS.filter((c) => String(d?.notas?.[c] ?? "").trim() === "");
+  if (semNota.length) faltando.push(`Notas dos critérios: ${semNota.join(", ")}`);
+
+  const av = d?.avaliador ?? {};
+  const obrigatoriosAv: [string, string][] = [
+    ["nome", tipo === "FAPEP1" ? "Nome do chefe imediato" : "Nome do par avaliador"],
+    ["cargo", "Cargo/função do avaliador"],
+    ["local", "Local"],
+    ["data", "Data"],
+  ];
+  for (const [chave, rotulo] of obrigatoriosAv) {
+    if (!String(av[chave] ?? "").trim()) faltando.push(rotulo);
+  }
+  return faltando;
+}
+
 export function formatarData(valor?: string | null): string {
   if (!valor) return "";
   const [ano, mes, dia] = valor.split("-");
