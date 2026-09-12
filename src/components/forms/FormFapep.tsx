@@ -51,6 +51,13 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
 
   const total = useMemo(() => somaNotas(d.notas), [d.notas]);
 
+  const { ciclo, etapa: janela } = useEtapaVigente(
+    tipo === "FAPEP1" ? "avaliacao_chefia" : "avaliacao_pares",
+    d.identificacao.orgao || null,
+    d.numeroAvaliacao ? Number(d.numeroAvaliacao) : null,
+  );
+  const aberto = dentroDaJanela(janela);
+
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="space-y-5">
