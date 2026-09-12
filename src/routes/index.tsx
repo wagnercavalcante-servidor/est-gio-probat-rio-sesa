@@ -67,6 +67,7 @@ function Pagina() {
   }
   abas.push({ valor: "CONSULTA", rotulo: ehGestaoPessoas ? "Formulários (somente leitura)" : "Consultar salvos" });
   if (ehAdmin) abas.push({ valor: "CALENDARIO", rotulo: "Calendário de prazos" });
+  if (ehAdmin) abas.push({ valor: "TESTE", rotulo: "Ambiente de teste" });
 
   const abaInicial = abas[0]?.valor ?? "CONSULTA";
   const formulariosProprios = (["FAPEP1", "FAPEP2", "FADA", "FAFEP"] as const).filter((t) =>
