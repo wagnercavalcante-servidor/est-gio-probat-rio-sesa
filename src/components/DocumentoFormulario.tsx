@@ -253,9 +253,11 @@ function Fapep({
         extra={[d.avaliador?.cargo, d.avaliador?.local, rev?.avaliador?.data ?? d.avaliador?.data]
           .filter(Boolean)
           .join(" — ")}
+        assinatura={assinaturas.find((a) =>
+          tipo === "FAPEP1" ? a.tipo_assinatura === "chefia_imediata" : a.tipo_assinatura === "par",
+        )}
       />
-      <BlocoComissao d={d} homologacao={homologacao} />
-
+      {homologacao ? <BlocoComissao d={d} homologacao={homologacao} /> : null}
     </>
   );
 }
