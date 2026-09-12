@@ -13,6 +13,7 @@ import { PainelServidor } from "@/components/PainelServidor";
 import { PainelRevisao } from "@/components/PainelRevisao";
 import { PainelComissao } from "@/components/PainelComissao";
 import { PainelCalendario } from "@/components/PainelCalendario";
+import { PainelTeste } from "@/components/PainelTeste";
 import { TIPOS, type TipoFormulario } from "@/lib/formularios";
 
 export const Route = createFileRoute("/")({

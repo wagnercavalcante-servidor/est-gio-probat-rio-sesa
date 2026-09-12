@@ -44,7 +44,7 @@ export function Consulta() {
   useEffect(() => {
     void carregar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [incluirTestes]);
 
   const baixar = async (registro: RegistroFormulario) => {
     setSelecionado(registro);
