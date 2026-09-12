@@ -7,6 +7,7 @@ import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { FormRaep } from "@/components/forms/FormRaep";
 import { baixarPdfPaginaUnica } from "@/lib/pdf";
 import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
+import { AlternarTestes } from "@/components/AlternarTestes";
 import { useAssinaturas } from "@/hooks/useAssinaturas";
 import { TIPOS } from "@/lib/formularios";
 import {
@@ -109,10 +110,12 @@ export function PainelServidor({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-5">
+      <AlternarTestes valor={incluirTestes} aoMudar={setIncluirTestes} />
       {carregando ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" /> Carregando suas avaliações…
         </p>
+
       ) : registros.length === 0 ? (
         <p className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
           Você ainda não possui avaliações registradas.
