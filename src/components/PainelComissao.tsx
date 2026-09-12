@@ -184,6 +184,7 @@ export function PainelComissao() {
                 homologacao={h}
                 registro={{ id: ativo.id, created_at: ativo.created_at }}
                 assinaturas={assinaturas}
+                teste={ativo.teste}
               />
             </div>
           </div>

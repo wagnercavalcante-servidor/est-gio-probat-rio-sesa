@@ -196,6 +196,7 @@ export function PainelServidor({ userId }: { userId: string }) {
               homologacao={selecionado.homologacao ?? undefined}
               registro={{ id: selecionado.id, created_at: selecionado.created_at }}
               assinaturas={assinaturas}
+              teste={selecionado.teste}
             />
             </div>
           </div>
