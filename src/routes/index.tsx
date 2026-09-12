@@ -163,6 +163,12 @@ function Pagina() {
               <PainelCalendario userId={sessao.user.id} />
             </TabsContent>
           )}
+
+          {ehAdmin && (
+            <TabsContent value="TESTE" className="mt-5">
+              <PainelTeste userId={sessao.user.id} email={sessao.user.email ?? ""} />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>
