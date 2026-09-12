@@ -475,7 +475,15 @@ export const DocumentoFormulario = forwardRef<
       {registro && assinaturas.length > 0 ? (
         <div className={`${linha} mt-2 px-1.5 py-1 text-[6.5px] leading-snug`}>
           <p className="font-bold uppercase">Assinaturas eletrônicas</p>
-          {assinaturas.map((a) => (
+          {assinaturas
+            .filter(
+              (a) =>
+                !(
+                  (tipo === "FAPEP1" && a.tipo_assinatura === "chefia_imediata") ||
+                  (tipo === "FAPEP2" && a.tipo_assinatura === "par")
+                ),
+            )
+            .map((a) => (
             <p key={a.id}>
               <strong>{a.nome}</strong>
               {a.matricula ? ` — matrícula ${a.matricula}` : ""} —{" "}
