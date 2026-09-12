@@ -184,11 +184,13 @@ function Fapep({
   tipo,
   rev,
   homologacao,
+  assinaturas = [],
 }: {
   d: Dados;
   tipo: TipoFormulario;
   rev?: Dados;
   homologacao?: Dados;
+  assinaturas?: AssinaturaRegistro[];
 }) {
   const id = d.identificacao ?? {};
   const total = somaNotas((rev?.notas ?? d.notas) ?? {});
