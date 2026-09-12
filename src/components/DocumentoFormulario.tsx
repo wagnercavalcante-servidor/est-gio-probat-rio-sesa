@@ -466,7 +466,7 @@ export const DocumentoFormulario = forwardRef<
         </p>
       ) : null}
       {tipo === "FAPEP1" || tipo === "FAPEP2" ? (
-        <Fapep d={dados} tipo={tipo} rev={revisao} homologacao={homologacao} />
+        <Fapep d={dados} tipo={tipo} rev={revisao} homologacao={homologacao} assinaturas={assinaturas} />
       ) : null}
       {tipo === "FAFEP" ? <Fafep d={dados} /> : null}
       {tipo === "RAEP" ? <Raep d={dados} /> : null}
