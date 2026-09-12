@@ -105,6 +105,7 @@ export type Database = {
           nome: string
           numero_avaliacao: number | null
           orgao: string | null
+          teste: boolean
           updated_at: string
         }
         Insert: {
@@ -115,6 +116,7 @@ export type Database = {
           nome: string
           numero_avaliacao?: number | null
           orgao?: string | null
+          teste?: boolean
           updated_at?: string
         }
         Update: {
@@ -125,6 +127,7 @@ export type Database = {
           nome?: string
           numero_avaliacao?: number | null
           orgao?: string | null
+          teste?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -152,6 +155,7 @@ export type Database = {
           servidor_nome: string
           servidor_user_id: string | null
           status: string
+          teste: boolean
           tipo: string
           updated_at: string
         }
@@ -177,6 +181,7 @@ export type Database = {
           servidor_nome: string
           servidor_user_id?: string | null
           status?: string
+          teste?: boolean
           tipo: string
           updated_at?: string
         }
@@ -202,6 +207,7 @@ export type Database = {
           servidor_nome?: string
           servidor_user_id?: string | null
           status?: string
+          teste?: boolean
           tipo?: string
           updated_at?: string
         }
@@ -310,6 +316,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      encerrar_prazo_teste: { Args: { _id: string }; Returns: undefined }
       expirar_prazos_avaliacao: { Args: never; Returns: undefined }
       listar_orgaos: {
         Args: never

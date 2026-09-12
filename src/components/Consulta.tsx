@@ -9,12 +9,14 @@ import { baixarPdfPaginaUnica } from "@/lib/pdf";
 import { TIPOS } from "@/lib/formularios";
 import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
 import { useAssinaturas } from "@/hooks/useAssinaturas";
+import { AlternarTestes } from "@/components/AlternarTestes";
 import { COLUNAS_FORMULARIO, ROTULO_STATUS, type RegistroFormulario } from "@/lib/fluxo";
 
 export function Consulta() {
   const [registros, setRegistros] = useState<RegistroFormulario[]>([]);
   const [busca, setBusca] = useState("");
   const [carregando, setCarregando] = useState(true);
+  const [incluirTestes, setIncluirTestes] = useState(false);
   const [selecionado, setSelecionado] = useState<RegistroFormulario | null>(null);
   const referencia = useRef<HTMLDivElement>(null);
   const { assinaturas } = useAssinaturas(selecionado?.id);
@@ -26,6 +28,7 @@ export function Consulta() {
       .select(COLUNAS_FORMULARIO)
       .order("created_at", { ascending: false })
       .limit(100);
+    if (!incluirTestes) consulta = consulta.eq("teste", false);
     if (busca.trim()) {
       consulta = consulta.or(`servidor_nome.ilike.%${busca.trim()}%,servidor_matricula.ilike.%${busca.trim()}%`);
     }
@@ -41,7 +44,7 @@ export function Consulta() {
   useEffect(() => {
     void carregar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [incluirTestes]);
 
   const baixar = async (registro: RegistroFormulario) => {
     setSelecionado(registro);
@@ -71,6 +74,7 @@ export function Consulta() {
         <Button onClick={carregar} variant="outline">
           Buscar
         </Button>
+        <AlternarTestes valor={incluirTestes} aoMudar={setIncluirTestes} />
       </div>
 
       {carregando ? (
@@ -128,6 +132,7 @@ export function Consulta() {
               homologacao={selecionado.homologacao ?? undefined}
               registro={{ id: selecionado.id, created_at: selecionado.created_at }}
               assinaturas={assinaturas}
+              teste={selecionado.teste}
             />
             </div>
           </div>

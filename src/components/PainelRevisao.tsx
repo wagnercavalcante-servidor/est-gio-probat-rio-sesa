@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Bloco, CampoArea } from "@/components/Campos";
 import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { PONTUACAO_MAXIMA, REQUISITOS, TIPOS, somaNotas } from "@/lib/formularios";
+import { AlternarTestes } from "@/components/AlternarTestes";
 import { COLUNAS_FORMULARIO, prazoTresDiasUteis, type RegistroFormulario } from "@/lib/fluxo";
 
 export function PainelRevisao({ userId }: { userId: string }) {
@@ -18,22 +19,25 @@ export function PainelRevisao({ userId }: { userId: string }) {
   const [justificativas, setJustificativas] = useState<Record<string, string>>({});
   const [observacoes, setObservacoes] = useState("");
   const [salvando, setSalvando] = useState(false);
+  const [incluirTestes, setIncluirTestes] = useState(false);
 
   const carregar = useCallback(async () => {
     setCarregando(true);
-    const { data, error } = await supabase
+    let consulta = supabase
       .from("formularios")
       .select(COLUNAS_FORMULARIO)
       .eq("created_by", userId)
       .eq("status", "em_revisao")
       .order("created_at", { ascending: false });
+    if (!incluirTestes) consulta = consulta.eq("teste", false);
+    const { data, error } = await consulta;
     setCarregando(false);
     if (error) {
       toast.error("Erro ao carregar revisões: " + error.message);
       return;
     }
     setRegistros((data ?? []) as unknown as RegistroFormulario[]);
-  }, [userId]);
+  }, [userId, incluirTestes]);
 
   useEffect(() => {
     void carregar();
@@ -171,6 +175,7 @@ export function PainelRevisao({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-4">
+      <AlternarTestes valor={incluirTestes} aoMudar={setIncluirTestes} />
       {carregando ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" /> Carregando…
