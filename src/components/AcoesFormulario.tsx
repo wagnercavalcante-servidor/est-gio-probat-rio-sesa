@@ -8,7 +8,7 @@ import { baixarPdfPaginaUnica } from "@/lib/pdf";
 import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
 import { useAssinaturas } from "@/hooks/useAssinaturas";
 import type { TipoAssinatura } from "@/lib/assinaturas";
-import type { TipoFormulario } from "@/lib/formularios";
+import { pendenciasFapep, type TipoFormulario } from "@/lib/formularios";
 
 const ASSINATURA_POR_TIPO: Record<TipoFormulario, TipoAssinatura> = {
   FAPEP1: "chefia_imediata",
