@@ -58,6 +58,77 @@ export type Database = {
           },
         ]
       }
+      ciclo_etapas: {
+        Row: {
+          ciclo_id: string
+          created_at: string
+          data_fim: string | null
+          data_inicio: string | null
+          etapa: Database["public"]["Enums"]["etapa_avaliacao"]
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          ciclo_id: string
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          etapa: Database["public"]["Enums"]["etapa_avaliacao"]
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          ciclo_id?: string
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          etapa?: Database["public"]["Enums"]["etapa_avaliacao"]
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ciclo_etapas_ciclo_id_fkey"
+            columns: ["ciclo_id"]
+            isOneToOne: false
+            referencedRelation: "ciclos_avaliacao"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ciclos_avaliacao: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          created_by: string
+          id: string
+          nome: string
+          numero_avaliacao: number | null
+          orgao: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          created_by: string
+          id?: string
+          nome: string
+          numero_avaliacao?: number | null
+          orgao?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          created_by?: string
+          id?: string
+          nome?: string
+          numero_avaliacao?: number | null
+          orgao?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       formularios: {
         Row: {
           codigo_verificacao: string | null
@@ -250,6 +321,14 @@ export type Database = {
         Args: { _dias: number; _inicio: string }
         Returns: string
       }
+      prazo_etapa: {
+        Args: {
+          _etapa: Database["public"]["Enums"]["etapa_avaliacao"]
+          _numero: number
+          _orgao: string
+        }
+        Returns: string
+      }
       verificar_documento: { Args: { _codigo: string }; Returns: Json }
     }
     Enums: {
@@ -262,6 +341,17 @@ export type Database = {
         | "chefia_mediata"
         | "par"
         | "servidor"
+      etapa_avaliacao:
+        | "avaliacao_chefia"
+        | "avaliacao_pares"
+        | "ciencia_servidor"
+        | "pedido_reconsideracao"
+        | "resposta_chefia"
+        | "ciencia_resposta_chefia"
+        | "recurso_comissao_setorial"
+        | "resposta_comissao_setorial"
+        | "ciencia_resposta_setorial"
+        | "recurso_comissao_central"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -398,6 +488,18 @@ export const Constants = {
         "chefia_mediata",
         "par",
         "servidor",
+      ],
+      etapa_avaliacao: [
+        "avaliacao_chefia",
+        "avaliacao_pares",
+        "ciencia_servidor",
+        "pedido_reconsideracao",
+        "resposta_chefia",
+        "ciencia_resposta_chefia",
+        "recurso_comissao_setorial",
+        "resposta_comissao_setorial",
+        "ciencia_resposta_setorial",
+        "recurso_comissao_central",
       ],
     },
   },

@@ -12,6 +12,7 @@ import { FormFada } from "@/components/forms/FormFada";
 import { PainelServidor } from "@/components/PainelServidor";
 import { PainelRevisao } from "@/components/PainelRevisao";
 import { PainelComissao } from "@/components/PainelComissao";
+import { PainelCalendario } from "@/components/PainelCalendario";
 import { TIPOS, type TipoFormulario } from "@/lib/formularios";
 
 export const Route = createFileRoute("/")({
@@ -64,6 +65,7 @@ function Pagina() {
     );
   }
   abas.push({ valor: "CONSULTA", rotulo: ehGestaoPessoas ? "Formulários (somente leitura)" : "Consultar salvos" });
+  if (ehAdmin) abas.push({ valor: "CALENDARIO", rotulo: "Calendário de prazos" });
 
   const abaInicial = abas[0]?.valor ?? "CONSULTA";
   const formulariosProprios = (["FAPEP1", "FAPEP2", "FADA", "FAFEP"] as const).filter((t) =>
@@ -153,6 +155,12 @@ function Pagina() {
             )}
             <Consulta />
           </TabsContent>
+
+          {ehAdmin && (
+            <TabsContent value="CALENDARIO" className="mt-5">
+              <PainelCalendario userId={sessao.user.id} />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>

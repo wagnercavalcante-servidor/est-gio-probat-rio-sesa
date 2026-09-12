@@ -5,6 +5,8 @@ import { AcoesFormulario } from "@/components/AcoesFormulario";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { REQUISITOS, PONTUACAO_MAXIMA, formatarData, somaNotas } from "@/lib/formularios";
+import { useEtapaVigente } from "@/hooks/useEtapaVigente";
+import { dentroDaJanela, formatarDataBr } from "@/lib/calendario";
 
 const estadoInicial = {
   identificacao: { matricula: "", nome: "", ato: "", dataInicio: "", cargo: "", orgao: "", setor: "" },
@@ -48,6 +50,13 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
   };
 
   const total = useMemo(() => somaNotas(d.notas), [d.notas]);
+
+  const { ciclo, etapa: janela } = useEtapaVigente(
+    tipo === "FAPEP1" ? "avaliacao_chefia" : "avaliacao_pares",
+    d.identificacao.orgao || null,
+    d.numeroAvaliacao ? Number(d.numeroAvaliacao) : null,
+  );
+  const aberto = dentroDaJanela(janela);
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -164,7 +173,21 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
         </p>
       </div>
 
-      <div className="xl:sticky xl:top-6 xl:self-start">
+      <div className="xl:sticky xl:top-6 xl:self-start space-y-4">
+        {ciclo && janela && (
+          <p
+            className={
+              aberto
+                ? "rounded-lg border border-border bg-card p-4 text-xs text-muted-foreground"
+                : "rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive"
+            }
+          >
+            <strong>{ciclo.nome}</strong> — período desta avaliação: {formatarDataBr(janela.data_inicio)} a{" "}
+            {formatarDataBr(janela.data_fim)}.{" "}
+            {aberto ? "Prazo em aberto." : "Fora do prazo definido pela administração; o registro está bloqueado."}
+          </p>
+        )}
+        {!aberto ? null : (
         <AcoesFormulario
           tipo={tipo}
           dados={d}
@@ -175,6 +198,7 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
           pontuacao={total}
           mensagemPosSalvar="Avaliação registrada. O servidor avaliado foi notificado e tem 3 dias úteis para se manifestar."
         />
+        )}
       </div>
     </div>
   );
