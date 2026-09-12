@@ -19,6 +19,7 @@ import {
 export function PainelServidor({ userId }: { userId: string }) {
   const [registros, setRegistros] = useState<RegistroFormulario[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [incluirTestes, setIncluirTestes] = useState(false);
   const [selecionado, setSelecionado] = useState<RegistroFormulario | null>(null);
   const [recurso, setRecurso] = useState<RegistroFormulario | null>(null);
   const referencia = useRef<HTMLDivElement>(null);
@@ -27,22 +28,25 @@ export function PainelServidor({ userId }: { userId: string }) {
   const carregar = useCallback(async () => {
     setCarregando(true);
     await supabase.rpc("expirar_prazos_avaliacao" as never);
-    const { data, error } = await supabase
+    let consulta = supabase
       .from("formularios")
       .select(COLUNAS_FORMULARIO)
       .eq("servidor_user_id", userId)
       .order("created_at", { ascending: false });
+    if (!incluirTestes) consulta = consulta.eq("teste", false);
+    const { data, error } = await consulta;
     setCarregando(false);
     if (error) {
       toast.error("Erro ao carregar suas avaliações: " + error.message);
       return;
     }
     setRegistros((data ?? []) as unknown as RegistroFormulario[]);
-  }, [userId]);
+  }, [userId, incluirTestes]);
 
   useEffect(() => {
     void carregar();
   }, [carregar]);
+
 
   const responder = async (r: RegistroFormulario, concorda: boolean) => {
     const revisao = r.status === "aguardando_servidor_revisao";
