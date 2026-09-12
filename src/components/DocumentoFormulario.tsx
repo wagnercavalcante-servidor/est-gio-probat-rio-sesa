@@ -432,10 +432,16 @@ export const DocumentoFormulario = forwardRef<
     homologacao?: Dados;
     registro?: { id: string; created_at: string } | undefined;
     assinaturas?: AssinaturaRegistro[];
+    teste?: boolean;
   }
->(function DocumentoFormulario({ tipo, dados, revisao, homologacao, registro, assinaturas = [] }, ref) {
+>(function DocumentoFormulario({ tipo, dados, revisao, homologacao, registro, assinaturas = [], teste }, ref) {
   return (
     <div ref={ref} className="folha-a4">
+      {teste ? (
+        <p className="mb-1 border border-dashed border-[#b45309] px-1.5 py-[2px] text-center text-[8px] font-bold uppercase text-[#b45309]">
+          Documento de teste — sem validade administrativa
+        </p>
+      ) : null}
       {tipo === "FAPEP1" || tipo === "FAPEP2" ? (
         <Fapep d={dados} tipo={tipo} rev={revisao} homologacao={homologacao} />
       ) : null}

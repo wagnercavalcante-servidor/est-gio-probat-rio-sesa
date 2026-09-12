@@ -22,7 +22,7 @@ export const ROTULO_STATUS: Record<string, string> = {
 };
 
 export const COLUNAS_FORMULARIO =
-  "id, tipo, servidor_nome, servidor_matricula, orgao, numero_avaliacao, pontuacao, created_at, dados, status, prazo_resposta, resposta_servidor, resposta_em, dados_revisao, revisado_em, homologacao, homologado_em, servidor_user_id, created_by, raep_formulario_id";
+  "id, tipo, servidor_nome, servidor_matricula, orgao, numero_avaliacao, pontuacao, created_at, dados, status, prazo_resposta, resposta_servidor, resposta_em, dados_revisao, revisado_em, homologacao, homologado_em, servidor_user_id, created_by, raep_formulario_id, teste";
 
 export type RegistroFormulario = {
   id: string;
@@ -48,6 +48,7 @@ export type RegistroFormulario = {
   servidor_user_id: string | null;
   created_by: string;
   raep_formulario_id: string | null;
+  teste?: boolean;
 };
 
 /** Prazo de resposta: 3 dias úteis a contar de hoje, até as 23h59. */
