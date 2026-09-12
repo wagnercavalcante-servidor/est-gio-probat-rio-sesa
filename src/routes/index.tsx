@@ -12,6 +12,7 @@ import { FormFada } from "@/components/forms/FormFada";
 import { PainelServidor } from "@/components/PainelServidor";
 import { PainelRevisao } from "@/components/PainelRevisao";
 import { PainelComissao } from "@/components/PainelComissao";
+import { PainelCalendario } from "@/components/PainelCalendario";
 import { TIPOS, type TipoFormulario } from "@/lib/formularios";
 
 export const Route = createFileRoute("/")({
