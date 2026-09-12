@@ -74,6 +74,7 @@ export function Consulta() {
         <Button onClick={carregar} variant="outline">
           Buscar
         </Button>
+        <AlternarTestes valor={incluirTestes} aoMudar={setIncluirTestes} />
       </div>
 
       {carregando ? (
