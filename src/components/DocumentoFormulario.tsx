@@ -39,12 +39,31 @@ function Secao({ children }: { children: string }) {
   );
 }
 
-function Assinatura({ nome, rotulo, extra }: { nome?: string; rotulo: string; extra?: string }) {
+function Assinatura({
+  nome,
+  rotulo,
+  extra,
+  assinatura,
+}: {
+  nome?: string;
+  rotulo: string;
+  extra?: string;
+  assinatura?: AssinaturaRegistro | undefined;
+}) {
   return (
     <div className="mt-4 text-center text-[8px]">
-      <div className="mx-auto w-[80%] border-b border-[#10231c] pb-[2px] font-semibold">{nome || "\u00A0"}</div>
+      <div className="mx-auto w-[80%] border-b border-[#10231c] pb-[2px] font-semibold">
+        {assinatura?.nome || nome || "\u00A0"}
+      </div>
       <div className="uppercase">{rotulo}</div>
       {extra ? <div>{extra}</div> : null}
+      {assinatura ? (
+        <div className="mx-auto mt-[2px] w-[80%] border border-dashed border-[#10231c]/50 px-1 py-[2px] text-[6.5px] leading-snug">
+          <span className="font-semibold uppercase">Assinado eletronicamente</span> por {assinatura.nome}
+          {assinatura.matricula ? ` — matrícula ${assinatura.matricula}` : ""} em{" "}
+          {formatarDataHora(assinatura.assinado_em)} — código {codigoDocumento(assinatura.formulario_id)}
+        </div>
+      ) : null}
     </div>
   );
 }
