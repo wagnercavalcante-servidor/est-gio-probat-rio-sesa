@@ -5,6 +5,8 @@ import { AcoesFormulario } from "@/components/AcoesFormulario";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { REQUISITOS, PONTUACAO_MAXIMA, formatarData, somaNotas } from "@/lib/formularios";
+import { useEtapaVigente } from "@/hooks/useEtapaVigente";
+import { dentroDaJanela, formatarDataBr } from "@/lib/calendario";
 
 const estadoInicial = {
   identificacao: { matricula: "", nome: "", ato: "", dataInicio: "", cargo: "", orgao: "", setor: "" },
