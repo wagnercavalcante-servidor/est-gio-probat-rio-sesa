@@ -199,6 +199,7 @@ export function PainelComissao() {
 
   return (
     <div className="space-y-4">
+      <AlternarTestes valor={incluirTestes} aoMudar={setIncluirTestes} />
       {carregando ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" /> Carregando…
