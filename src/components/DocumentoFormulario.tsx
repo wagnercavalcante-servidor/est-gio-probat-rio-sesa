@@ -432,7 +432,7 @@ export const DocumentoFormulario = forwardRef<
     homologacao?: Dados;
     registro?: { id: string; created_at: string } | undefined;
     assinaturas?: AssinaturaRegistro[];
-    teste?: boolean;
+    teste?: boolean | undefined;
   }
 >(function DocumentoFormulario({ tipo, dados, revisao, homologacao, registro, assinaturas = [], teste }, ref) {
   return (
