@@ -198,6 +198,7 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
           pontuacao={total}
           mensagemPosSalvar="Avaliação registrada. O servidor avaliado foi notificado e tem 3 dias úteis para se manifestar."
         />
+        )}
       </div>
     </div>
   );
