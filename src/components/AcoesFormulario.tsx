@@ -47,9 +47,17 @@ export function AcoesFormulario({
   const [registro, setRegistro] = useState<{ id: string; created_at: string } | null>(null);
   const { assinaturas, recarregar } = useAssinaturas(registro?.id);
 
+  const pendencias =
+    tipo === "FAPEP1" || tipo === "FAPEP2" ? pendenciasFapep(dados, tipo) : [];
+  const completo = pendencias.length === 0;
+
   const salvar = async () => {
     if (!servidorNome?.trim()) {
       toast.error("Informe o nome do servidor avaliado antes de salvar.");
+      return;
+    }
+    if (!completo) {
+      toast.error("Preencha todos os campos obrigatórios antes de salvar.");
       return;
     }
     setSalvando(true);
