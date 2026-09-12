@@ -173,7 +173,21 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
         </p>
       </div>
 
-      <div className="xl:sticky xl:top-6 xl:self-start">
+      <div className="xl:sticky xl:top-6 xl:self-start space-y-4">
+        {ciclo && janela && (
+          <p
+            className={
+              aberto
+                ? "rounded-lg border border-border bg-card p-4 text-xs text-muted-foreground"
+                : "rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive"
+            }
+          >
+            <strong>{ciclo.nome}</strong> — período desta avaliação: {formatarDataBr(janela.data_inicio)} a{" "}
+            {formatarDataBr(janela.data_fim)}.{" "}
+            {aberto ? "Prazo em aberto." : "Fora do prazo definido pela administração; o registro está bloqueado."}
+          </p>
+        )}
+        {!aberto ? null : (
         <AcoesFormulario
           tipo={tipo}
           dados={d}
