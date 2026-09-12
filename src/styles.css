@@ -143,9 +143,13 @@
   }
 }
 
-/* Folha A4 usada na pré-visualização e na geração do PDF */
+/* Folha A4 usada na pré-visualização e na geração do PDF.
+   Proporção exata da folha A4 (794 x 1123 px a 96 dpi) para que o PDF
+   gerado seja idêntico à pré-visualização exibida na tela. */
 @utility folha-a4 {
   width: 794px;
+  min-height: 1123px;
+  box-sizing: border-box;
   background: #ffffff;
   color: #10231c;
   padding: 26px 30px;
