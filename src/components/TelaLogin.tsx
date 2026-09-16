@@ -191,25 +191,7 @@ export function TelaLogin() {
           {modo === "entrar" ? "Ainda não tem acesso? Criar conta" : "Já tem acesso? Entrar"}
         </button>
 
-        <button
-          type="button"
-          className="mt-2 w-full text-xs text-muted-foreground underline-offset-4 hover:underline"
-          onClick={async () => {
-            if (!email) {
-              toast.error("Informe o e-mail para reenviar a confirmação.");
-              return;
-            }
-            const { error } = await supabase.auth.resend({
-              type: "signup",
-              email,
-              options: { emailRedirectTo: window.location.origin },
-            });
-            if (error) toast.error("Não foi possível reenviar: " + error.message);
-            else toast.success("E-mail de confirmação reenviado para " + email + ".");
-          }}
-        >
-          Não recebeu o e-mail de confirmação? Reenviar
-        </button>
+
       </div>
     </main>
   );
