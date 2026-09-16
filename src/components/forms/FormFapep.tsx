@@ -27,10 +27,15 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
   const atualizar = (caminho: string, valor: string) => {
     setD((anterior) => {
       const copia = structuredClone(anterior) as Record<string, any>;
-      const partes = caminho.split(".");
-      let alvo = copia;
-      for (const parte of partes.slice(0, -1)) alvo = alvo[parte];
-      alvo[partes[partes.length - 1]!] = valor;
+      const separador = caminho.indexOf(".");
+      if (separador === -1) {
+        copia[caminho] = valor;
+        return copia as typeof anterior;
+      }
+      const grupo = caminho.slice(0, separador);
+      const chave = caminho.slice(separador + 1);
+      if (typeof copia[grupo] !== "object" || copia[grupo] === null) copia[grupo] = {};
+      copia[grupo][chave] = valor;
       return copia as typeof anterior;
     });
   };
