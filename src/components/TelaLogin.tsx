@@ -70,7 +70,11 @@ export function TelaLogin() {
         return;
       }
       if (!data.session) {
-        toast.success("Conta criada. Confirme o cadastro pelo link enviado ao seu e-mail.");
+        toast.success(
+          "Conta criada. Enviamos um e-mail de confirmação para " +
+            email +
+            ". Verifique também a caixa de spam ou lixo eletrônico.",
+        );
         setModo("entrar");
       }
     }
