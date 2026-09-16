@@ -201,9 +201,8 @@ function Fapep({
       <div className="grid grid-cols-3">
         <Campo rotulo="Matrícula" valor={id.matricula} />
         <Campo rotulo="Nome" valor={id.nome} className="col-span-2 border-l-0" />
-        <Campo rotulo="Ato de nomeação" valor={id.ato} className="border-t-0" />
-        <Campo rotulo="Início do exercício" valor={id.dataInicio} className="border-l-0 border-t-0" />
-        <Campo rotulo="Cargo" valor={id.cargo} className="border-l-0 border-t-0" />
+        <Campo rotulo="Início do exercício" valor={id.dataInicio} className="border-t-0" />
+        <Campo rotulo="Cargo" valor={id.cargo} className="col-span-2 border-l-0 border-t-0" />
         <Campo rotulo="Órgão/Entidade" valor={id.orgao} className="col-span-2 border-t-0" />
         <Campo rotulo="Setor" valor={id.setor} className="border-l-0 border-t-0" />
       </div>

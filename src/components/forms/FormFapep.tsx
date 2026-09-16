@@ -9,7 +9,7 @@ import { useEtapaVigente } from "@/hooks/useEtapaVigente";
 import { dentroDaJanela, formatarDataBr } from "@/lib/calendario";
 
 const estadoInicial = {
-  identificacao: { matricula: "", nome: "", ato: "", dataInicio: "", cargo: "", orgao: "", setor: "" },
+  identificacao: { matricula: "", nome: "", dataInicio: "", cargo: "", orgao: "", setor: "" },
   numeroAvaliacao: "",
   periodoInicio: "",
   periodoFim: "",
@@ -27,10 +27,15 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
   const atualizar = (caminho: string, valor: string) => {
     setD((anterior) => {
       const copia = structuredClone(anterior) as Record<string, any>;
-      const partes = caminho.split(".");
-      let alvo = copia;
-      for (const parte of partes.slice(0, -1)) alvo = alvo[parte];
-      alvo[partes[partes.length - 1]!] = valor;
+      const separador = caminho.indexOf(".");
+      if (separador === -1) {
+        copia[caminho] = valor;
+        return copia as typeof anterior;
+      }
+      const grupo = caminho.slice(0, separador);
+      const chave = caminho.slice(separador + 1);
+      if (typeof copia[grupo] !== "object" || copia[grupo] === null) copia[grupo] = {};
+      copia[grupo][chave] = valor;
       return copia as typeof anterior;
     });
   };
@@ -70,7 +75,7 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
               valor={d.identificacao.matricula}
               aoMudar={(v) => atualizar("identificacao.matricula", v)}
             />
-            <CampoTexto rotulo="Ato de nomeação" valor={d.identificacao.ato} aoMudar={(v) => atualizar("identificacao.ato", v)} />
+            
             <CampoTexto
               rotulo="Data do início do exercício"
               valor={d.identificacao.dataInicio}
@@ -196,6 +201,7 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
           orgao={d.identificacao.orgao}
           numeroAvaliacao={d.numeroAvaliacao ? Number(d.numeroAvaliacao) : null}
           pontuacao={total}
+          ocultarPrevia
           mensagemPosSalvar="Avaliação registrada. O servidor avaliado foi notificado e tem 3 dias úteis para se manifestar."
         />
         )}

@@ -173,7 +173,7 @@ export function pendenciasFapep(d: any, tipo: "FAPEP1" | "FAPEP2"): string[] {
   const obrigatoriosId: [string, string][] = [
     ["nome", "Nome do servidor"],
     ["matricula", "Matrícula"],
-    ["ato", "Ato de nomeação"],
+    
     ["dataInicio", "Data do início do exercício"],
     ["cargo", "Cargo"],
     ["orgao", "Órgão/Entidade"],
