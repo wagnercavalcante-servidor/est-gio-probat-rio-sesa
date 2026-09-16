@@ -42,6 +42,7 @@ export function AcoesFormulario({
   pontuacao,
   aoSalvar,
   mensagemPosSalvar,
+  ocultarPrevia,
 }: Props) {
   const referencia = useRef<HTMLDivElement>(null);
   const [salvando, setSalvando] = useState(false);
@@ -149,7 +150,14 @@ export function AcoesFormulario({
         />
       )}
 
-      <div className="overflow-auto rounded-lg border border-border bg-muted p-4">
+      <div
+        className={
+          ocultarPrevia
+            ? "pointer-events-none absolute -left-[10000px] top-0 h-0 overflow-hidden"
+            : "overflow-auto rounded-lg border border-border bg-muted p-4"
+        }
+        aria-hidden={ocultarPrevia ? true : undefined}
+      >
         <div className="mx-auto w-fit origin-top shadow-panel">
           <DocumentoFormulario
             ref={referencia}
