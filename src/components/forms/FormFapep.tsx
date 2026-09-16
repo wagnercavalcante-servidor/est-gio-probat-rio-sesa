@@ -9,7 +9,7 @@ import { useEtapaVigente } from "@/hooks/useEtapaVigente";
 import { dentroDaJanela, formatarDataBr } from "@/lib/calendario";
 
 const estadoInicial = {
-  identificacao: { matricula: "", nome: "", ato: "", dataInicio: "", cargo: "", orgao: "", setor: "" },
+  identificacao: { matricula: "", nome: "", dataInicio: "", cargo: "", orgao: "", setor: "" },
   numeroAvaliacao: "",
   periodoInicio: "",
   periodoFim: "",
@@ -75,7 +75,7 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
               valor={d.identificacao.matricula}
               aoMudar={(v) => atualizar("identificacao.matricula", v)}
             />
-            <CampoTexto rotulo="Ato de nomeação" valor={d.identificacao.ato} aoMudar={(v) => atualizar("identificacao.ato", v)} />
+            
             <CampoTexto
               rotulo="Data do início do exercício"
               valor={d.identificacao.dataInicio}
