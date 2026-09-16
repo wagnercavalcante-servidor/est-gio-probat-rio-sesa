@@ -29,6 +29,7 @@ type Props = {
   pontuacao?: number | null;
   aoSalvar?: (id: string) => void | Promise<void>;
   mensagemPosSalvar?: string;
+  ocultarPrevia?: boolean;
 };
 
 export function AcoesFormulario({
