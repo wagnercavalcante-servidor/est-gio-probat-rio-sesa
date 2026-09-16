@@ -70,13 +70,15 @@ export function TelaLogin() {
         return;
       }
       if (!data.session) {
-        toast.success(
-          "Conta criada. Enviamos um e-mail de confirmação para " +
-            email +
-            ". Verifique também a caixa de spam ou lixo eletrônico.",
-        );
-        setModo("entrar");
+        const { error: erroEntrada } = await supabase.auth.signInWithPassword({ email, password: senha });
+        if (erroEntrada) {
+          toast.success("Conta criada. Entre com seu e-mail e senha.");
+          setModo("entrar");
+          return;
+        }
       }
+      toast.success("Conta criada com sucesso.");
+
     }
   };
 
