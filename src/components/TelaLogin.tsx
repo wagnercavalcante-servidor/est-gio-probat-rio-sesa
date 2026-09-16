@@ -70,7 +70,11 @@ export function TelaLogin() {
         return;
       }
       if (!data.session) {
-        toast.success("Conta criada. Confirme o cadastro pelo link enviado ao seu e-mail.");
+        toast.success(
+          "Conta criada. Enviamos um e-mail de confirmação para " +
+            email +
+            ". Verifique também a caixa de spam ou lixo eletrônico.",
+        );
         setModo("entrar");
       }
     }
@@ -183,6 +187,26 @@ export function TelaLogin() {
           onClick={() => setModo(modo === "entrar" ? "criar" : "entrar")}
         >
           {modo === "entrar" ? "Ainda não tem acesso? Criar conta" : "Já tem acesso? Entrar"}
+        </button>
+
+        <button
+          type="button"
+          className="mt-2 w-full text-xs text-muted-foreground underline-offset-4 hover:underline"
+          onClick={async () => {
+            if (!email) {
+              toast.error("Informe o e-mail para reenviar a confirmação.");
+              return;
+            }
+            const { error } = await supabase.auth.resend({
+              type: "signup",
+              email,
+              options: { emailRedirectTo: window.location.origin },
+            });
+            if (error) toast.error("Não foi possível reenviar: " + error.message);
+            else toast.success("E-mail de confirmação reenviado para " + email + ".");
+          }}
+        >
+          Não recebeu o e-mail de confirmação? Reenviar
         </button>
       </div>
     </main>
