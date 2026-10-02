@@ -324,6 +324,7 @@ export type Database = {
           orgao: string
         }[]
       }
+      orgao_do_usuario: { Args: { _uid: string }; Returns: string }
       prazo_dias_uteis: {
         Args: { _dias: number; _inicio: string }
         Returns: string
@@ -335,6 +336,13 @@ export type Database = {
           _orgao: string
         }
         Returns: string
+      }
+      usuario_tem_papel: {
+        Args: {
+          _papeis: Database["public"]["Enums"]["app_role"][]
+          _uid: string
+        }
+        Returns: boolean
       }
       verificar_documento: { Args: { _codigo: string }; Returns: Json }
     }
