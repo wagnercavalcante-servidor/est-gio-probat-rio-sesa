@@ -33,6 +33,14 @@ export function TelaLogin() {
   const [orgaos, setOrgaos] = useState<string[]>([]);
   const [carregando, setCarregando] = useState(false);
 
+  // PROVISÓRIO: login suspenso — entra automaticamente com a conta de acesso provisório (Administrador).
+  useEffect(() => {
+    void supabase.auth.signInWithPassword({
+      email: "acesso.provisorio@estagioprobatorio.app",
+      password: "Provisorio#2026",
+    });
+  }, []);
+
   useEffect(() => {
     void supabase.rpc("listar_orgaos" as never).then(({ data }) => {
       const lista = ((data ?? []) as Array<{ orgao: string }>).map((o) => o.orgao).filter(Boolean);
