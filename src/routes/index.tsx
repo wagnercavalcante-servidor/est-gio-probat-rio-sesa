@@ -13,6 +13,7 @@ import { PainelServidor } from "@/components/PainelServidor";
 import { PainelRevisao } from "@/components/PainelRevisao";
 import { PainelComissao } from "@/components/PainelComissao";
 import { PainelCalendario } from "@/components/PainelCalendario";
+import { PainelGerenciamento } from "@/components/PainelGerenciamento";
 import { PainelTeste } from "@/components/PainelTeste";
 import { TIPOS, type TipoFormulario } from "@/lib/formularios";
 
@@ -106,6 +107,15 @@ function Pagina() {
       </header>
 
       <main className="mx-auto max-w-[1500px] px-6 py-6">
+        <Tabs defaultValue="AVALIACAO">
+          <TabsList className="mb-5 grid h-auto w-full grid-cols-2">
+            <TabsTrigger value="AVALIACAO" className="py-2 text-sm sm:text-base">Avaliação de Estágio Probatório</TabsTrigger>
+            <TabsTrigger value="GERENCIAMENTO" className="py-2 text-sm sm:text-base">Gerenciamento Estágio Probatório</TabsTrigger>
+          </TabsList>
+          <TabsContent value="GERENCIAMENTO">
+            <PainelGerenciamento />
+          </TabsContent>
+          <TabsContent value="AVALIACAO">
         <Tabs defaultValue={abaInicial}>
           <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
             {abas.map((aba) => (
@@ -169,6 +179,8 @@ function Pagina() {
               <PainelTeste userId={sessao.user.id} email={sessao.user.email ?? ""} />
             </TabsContent>
           )}
+        </Tabs>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
