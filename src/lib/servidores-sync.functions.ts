@@ -7,7 +7,7 @@ const GATEWAY = "https://connector-gateway.lovable.dev/google_sheets/v4";
 function paraIso(v: unknown): string | null {
   const m = String(v ?? "").trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (!m) return null;
-  return `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  return `${m[3]}-${(m[2] ?? "").padStart(2, "0")}-${(m[1] ?? "").padStart(2, "0")}`;
 }
 
 /** Copia todos os servidores da planilha para a base usada na busca dos formulários. */
