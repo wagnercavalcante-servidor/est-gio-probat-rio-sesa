@@ -254,6 +254,7 @@ export type Database = {
           cargo: string | null
           created_at: string
           data_inicio_exercicio: string | null
+          datas_avaliacoes: string[] | null
           id: string
           matricula: string
           mes_admissao: string | null
@@ -267,6 +268,7 @@ export type Database = {
           cargo?: string | null
           created_at?: string
           data_inicio_exercicio?: string | null
+          datas_avaliacoes?: string[] | null
           id?: string
           matricula: string
           mes_admissao?: string | null
@@ -280,6 +282,7 @@ export type Database = {
           cargo?: string | null
           created_at?: string
           data_inicio_exercicio?: string | null
+          datas_avaliacoes?: string[] | null
           id?: string
           matricula?: string
           mes_admissao?: string | null
