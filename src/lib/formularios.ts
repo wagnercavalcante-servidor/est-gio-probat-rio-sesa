@@ -1,3 +1,5 @@
+import { Nota, PontuacaoTotal, ErroDominio } from "@/domain";
+
 export type Criterio = { id: string; nome: string; descricao: string };
 export type Requisito = {
   id: string;
@@ -156,11 +158,20 @@ export const TIPOS: Record<TipoFormulario, { sigla: string; anexo: string; titul
 };
 
 export function somaNotas(notas: Record<string, string | number | undefined>): number {
-  return TODOS_CRITERIOS.reduce((total, id) => {
-    const valor = Number(notas?.[id] ?? 0);
-    return total + (Number.isFinite(valor) ? valor : 0);
-  }, 0);
+  // Regra do decreto aplicada pelo núcleo de domínio (src/domain).
+  const validas = TODOS_CRITERIOS.flatMap((id) => {
+    const bruto = notas?.[id];
+    if (bruto === undefined || String(bruto).trim() === "") return [];
+    try {
+      return [Nota.criar(Number(String(bruto).replace(",", ".")), NOTA_MAXIMA_CRITERIO)];
+    } catch {
+      return [];
+    }
+  });
+  return PontuacaoTotal.de(validas).obtida;
 }
+
+export const NOTA_MAXIMA_CRITERIO = PONTUACAO_MAXIMA / TODOS_CRITERIOS.length;
 
 /**
  * Verifica se um FAPEP 1/2 está completo. A única parte opcional é
@@ -189,6 +200,15 @@ export function pendenciasFapep(d: any, tipo: "FAPEP1" | "FAPEP2"): string[] {
 
   const semNota = TODOS_CRITERIOS.filter((c) => String(d?.notas?.[c] ?? "").trim() === "");
   if (semNota.length) faltando.push(`Notas dos critérios: ${semNota.join(", ")}`);
+  for (const c of TODOS_CRITERIOS) {
+    const bruto = String(d?.notas?.[c] ?? "").trim();
+    if (!bruto) continue;
+    try {
+      Nota.criar(Number(bruto.replace(",", ".")), NOTA_MAXIMA_CRITERIO);
+    } catch (e) {
+      faltando.push(`Critério ${c}: ${e instanceof ErroDominio ? e.message : "nota inválida"}`);
+    }
+  }
 
   const av = d?.avaliador ?? {};
   const obrigatoriosAv: [string, string][] = [
