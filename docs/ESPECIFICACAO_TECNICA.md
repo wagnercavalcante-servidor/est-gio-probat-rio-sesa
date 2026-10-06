@@ -294,3 +294,8 @@ A camada `domain` não importa nada das demais. Telas e funções de servidor us
 ---
 
 *Documento técnico para instrução de planejamento e implantação pelas equipes de Tecnologia da Informação e Gestão de Pessoas do Estado do Ceará.*
+
+### Integração do domínio com as telas
+- Notas do FAPEP 1/2: soma e validação pela classe `Nota`/`PontuacaoTotal` (escala 0–10 por critério); nota fora da escala bloqueia salvar, assinar e baixar.
+- Fluxo: toda ação (concordar, pedir reconsideração, revisar, protocolar RAEP, homologar) passa por `decidirTransicao` (`src/domain/fluxo/FluxoAvaliacao.ts`), que confere o estado atual e o prazo legal em dias úteis (`PRAZOS_LEGAIS`) antes de gravar; ação fora do estado ou do prazo é recusada com mensagem.
+- O prazo de manifestação do servidor é calculado por `PrazoDiasUteis`.
