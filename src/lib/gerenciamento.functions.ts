@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const PLANILHA = "1yc2M7t6LICbWPZ3St5oC_e31fDAte_jQmu1stca0cDE";
+const PLANILHA = "1O935qh6XktbiAiIvLhFGA2vCgUo3ZTqFo3cqSf1E9iM";
 const GATEWAY = "https://connector-gateway.lovable.dev/google_sheets/v4";
 const ABAS_GERAIS = ["Números gerais", "Admitidos pós 11-03-2025"];
 
