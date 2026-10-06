@@ -10,7 +10,7 @@ import { TIPOS } from "@/lib/formularios";
 import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
 import { useAssinaturas } from "@/hooks/useAssinaturas";
 import { AlternarTestes } from "@/components/AlternarTestes";
-import { COLUNAS_FORMULARIO, ROTULO_STATUS, type RegistroFormulario } from "@/lib/fluxo";
+import { COLUNAS_FORMULARIO, ROTULO_STATUS, validarAcao, type RegistroFormulario } from "@/lib/fluxo";
 
 const homologacaoInicial = {
   discorda: "nao",

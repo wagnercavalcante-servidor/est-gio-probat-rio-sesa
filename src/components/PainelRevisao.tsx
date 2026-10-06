@@ -9,7 +9,7 @@ import { Bloco, CampoArea } from "@/components/Campos";
 import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { PONTUACAO_MAXIMA, REQUISITOS, TIPOS, somaNotas } from "@/lib/formularios";
 import { AlternarTestes } from "@/components/AlternarTestes";
-import { COLUNAS_FORMULARIO, prazoTresDiasUteis, type RegistroFormulario } from "@/lib/fluxo";
+import { COLUNAS_FORMULARIO, prazoTresDiasUteis, validarAcao, type RegistroFormulario } from "@/lib/fluxo";
 
 export function PainelRevisao({ userId }: { userId: string }) {
   const [registros, setRegistros] = useState<RegistroFormulario[]>([]);
