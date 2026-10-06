@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Bloco, CampoArea, CampoTexto } from "@/components/Campos";
-import { ServidorSelect, type Servidor } from "@/components/ServidorSelect";
+import { ServidorSelect, periodoDaAvaliacao, type Servidor } from "@/components/ServidorSelect";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AcoesFormulario } from "@/components/AcoesFormulario";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,18 +41,33 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
     });
   };
 
+  const [servidor, setServidor] = useState<Servidor | null>(null);
+
   const selecionarServidor = (s: Servidor) => {
-    setD((a) => ({
-      ...a,
-      identificacao: {
-        ...a.identificacao,
-        nome: s.nome,
-        matricula: s.matricula,
-        cargo: s.cargo ?? "",
-        orgao: s.orgao,
-        dataInicio: formatarData(s.data_inicio_exercicio),
-      },
-    }));
+    setServidor(s);
+    setD((a) => {
+      const p = periodoDaAvaliacao(s, Number(a.numeroAvaliacao));
+      return {
+        ...a,
+        periodoInicio: p?.inicio ?? a.periodoInicio,
+        periodoFim: p?.fim ?? a.periodoFim,
+        identificacao: {
+          ...a.identificacao,
+          nome: s.nome,
+          matricula: s.matricula,
+          cargo: s.cargo ?? "",
+          orgao: s.orgao,
+          dataInicio: formatarData(s.data_inicio_exercicio),
+        },
+      };
+    });
+  };
+
+  const escolherNumero = (v: string) => {
+    setD((a) => {
+      const p = periodoDaAvaliacao(servidor, Number(v));
+      return { ...a, numeroAvaliacao: v, periodoInicio: p?.inicio ?? a.periodoInicio, periodoFim: p?.fim ?? a.periodoFim };
+    });
   };
 
   const total = useMemo(() => somaNotas(d.notas), [d.notas]);
@@ -90,7 +106,17 @@ export function FormFapep({ tipo }: { tipo: "FAPEP1" | "FAPEP2" }) {
 
         <Bloco titulo={tipo === "FAPEP1" ? "Dados da avaliação (chefe imediato)" : "Dados da avaliação (par)"}>
           <div className="grid gap-3 sm:grid-cols-3">
-            <CampoTexto rotulo="Número da avaliação" valor={d.numeroAvaliacao} aoMudar={(v) => atualizar("numeroAvaliacao", v)} placeholder="1 a 6" />
+            <div className="space-y-1">
+              <Label htmlFor="numero-avaliacao">Número da avaliação</Label>
+              <Select value={d.numeroAvaliacao} onValueChange={escolherNumero}>
+                <SelectTrigger id="numero-avaliacao"><SelectValue placeholder="Escolha" /></SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6].map((n) => (
+                    <SelectItem key={n} value={String(n)}>{n}ª avaliação parcial</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <CampoTexto rotulo="Período de" valor={d.periodoInicio} aoMudar={(v) => atualizar("periodoInicio", v)} placeholder="dd/mm/aaaa" />
             <CampoTexto rotulo="Período até" valor={d.periodoFim} aoMudar={(v) => atualizar("periodoFim", v)} placeholder="dd/mm/aaaa" />
             {tipo === "FAPEP2" && (
