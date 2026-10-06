@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const PLANILHA = "1yc2M7t6LICbWPZ3St5oC_e31fDAte_jQmu1stca0cDE";
+const PLANILHA = "1O935qh6XktbiAiIvLhFGA2vCgUo3ZTqFo3cqSf1E9iM";
 const GATEWAY = "https://connector-gateway.lovable.dev/google_sheets/v4";
-const ABAS_GERAIS = ["Números gerais", "Admitidos pós 11-03-2025"];
+
+/** Abas que não são turmas de admissão por data. */
+const ABAS_IGNORADAS = new Set(["Página1"]);
 
 function cabecalhos() {
   const lovable = process.env["LOVABLE_API_KEY"];
@@ -13,29 +14,53 @@ function cabecalhos() {
   return { Authorization: `Bearer ${lovable}`, "X-Connection-Api-Key": sheets };
 }
 
-async function chamar(caminho: string) {
-  const r = await fetch(`${GATEWAY}/spreadsheets/${PLANILHA}${caminho}`, { headers: cabecalhos() });
+async function chamar(caminho: string, query = "") {
+  const r = await fetch(`${GATEWAY}/spreadsheets/${PLANILHA}${caminho}${query}`, { headers: cabecalhos() });
   if (!r.ok) throw new Error(`Falha ao ler a planilha [${r.status}]: ${await r.text()}`);
   return r.json();
 }
 
-export const listarOrgaosPlanilha = createServerFn({ method: "GET" })
+export type LinhaServidor = {
+  orgao: string;
+  nome: string;
+  matricula: string;
+  cargo: string;
+  anoAdmissao: string;
+  mesAdmissao: string;
+  dataExercicio: string;
+  avaliacoes: string[];
+};
+
+export const dadosGerenciamento = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async () => {
-    const dados = (await chamar("?fields=sheets.properties.title")) as {
+    const meta = (await chamar("?fields=sheets.properties.title")) as {
       sheets: { properties: { title: string } }[];
     };
-    return dados.sheets.map((s) => s.properties.title).filter((t) => !ABAS_GERAIS.includes(t));
-  });
+    const abas = meta.sheets.map((s) => s.properties.title).filter((t) => !ABAS_IGNORADAS.has(t));
 
-export const detalharOrgao = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ orgao: z.string().min(1).max(100) }).parse(d))
-  .handler(async ({ data }) => {
-    const intervalo = `'${data.orgao.replace(/'/g, "''")}'!A1:Z5000`;
-    const res = (await chamar(`/values/${encodeURI(intervalo)}`)) as { values?: string[][] };
-    const linhas = res.values ?? [];
-    const [cab = [], ...resto] = linhas;
-    const registros = resto.filter((l) => l.some((c) => c && c.trim()));
-    return { colunas: cab, linhas: registros };
+    const ranges = abas.map((t) => `'${t.replace(/'/g, "''")}'!A2:M5000`);
+    const qs = ranges.map((r) => `ranges=${r}`).join("&");
+    const res = (await chamar("/values:batchGet", `?${qs}`)) as {
+      valueRanges?: { range: string; values?: string[][] }[];
+    };
+
+    const linhas: LinhaServidor[] = [];
+    for (const vr of res.valueRanges ?? []) {
+      for (const row of vr.values ?? []) {
+        if (!row.some((c) => c && String(c).trim())) continue;
+        linhas.push({
+          orgao: String(row[0] ?? "").trim(),
+          nome: String(row[1] ?? "").trim(),
+          matricula: String(row[2] ?? "").trim(),
+          cargo: String(row[3] ?? "").trim(),
+          anoAdmissao: String(row[4] ?? "").trim(),
+          mesAdmissao: String(row[5] ?? "").trim(),
+          dataExercicio: String(row[6] ?? "").trim(),
+          avaliacoes: row.slice(7, 13).map((c) => String(c ?? "").trim()),
+        });
+      }
+    }
+
+    return { linhas };
   });
