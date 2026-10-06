@@ -5,6 +5,7 @@ import { ServidorSelect, type Servidor } from "@/components/ServidorSelect";
 import { AcoesFormulario } from "@/components/AcoesFormulario";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { validarAcao } from "@/lib/fluxo";
 
 const estadoInicial = {
   comissaoDestino: "Setorial",
@@ -47,9 +48,19 @@ export function FormRaep({ vinculo, aoConcluir }: { vinculo?: VinculoRecurso; ao
 
   const vincularAoFormulario = async (idRecurso: string) => {
     if (!vinculo) return;
+    const { data: atual } = await supabase
+      .from("formularios")
+      .select("status, prazo_resposta, resposta_em")
+      .eq("id", vinculo.formularioId)
+      .single();
+    const v = atual ? validarAcao(atual as Parameters<typeof validarAcao>[0], "protocolar_recurso") : null;
+    if (!v || !v.ok) {
+      toast.error(v && !v.ok ? v.erro : "Avaliação vinculada não encontrada.");
+      return;
+    }
     const { error } = await supabase
       .from("formularios")
-      .update({ status: "recurso_apresentado", raep_formulario_id: idRecurso })
+      .update({ status: v.proximo, raep_formulario_id: idRecurso })
       .eq("id", vinculo.formularioId);
     if (error) {
       toast.error("Recurso salvo, mas não foi possível vinculá-lo à avaliação: " + error.message);

@@ -85,6 +85,11 @@ export function PainelComissao() {
 
   const homologar = async () => {
     if (!ativo) return;
+    const v = validarAcao(ativo, "homologar");
+    if (!v.ok) {
+      toast.error(v.erro);
+      return;
+    }
     setSalvando(true);
     const { error } = await supabase
       .from("formularios")
@@ -92,7 +97,7 @@ export function PainelComissao() {
         homologacao: h,
         homologado_em: new Date().toISOString(),
         homologado_por: (await supabase.auth.getUser()).data.user?.id ?? null,
-        status: "homologado",
+        status: v.proximo,
       })
       .eq("id", ativo.id);
     setSalvando(false);

@@ -59,6 +59,11 @@ export function PainelRevisao({ userId }: { userId: string }) {
 
   const enviar = async () => {
     if (!ativo || !revisao) return;
+    const v = validarAcao(ativo, "revisar");
+    if (!v.ok) {
+      toast.error(v.erro);
+      return;
+    }
     setSalvando(true);
     const { error } = await supabase
       .from("formularios")
@@ -66,7 +71,7 @@ export function PainelRevisao({ userId }: { userId: string }) {
         dados_revisao: revisao,
         revisado_em: new Date().toISOString(),
         pontuacao: total,
-        status: "aguardando_servidor_revisao",
+        status: v.proximo,
         prazo_resposta: prazoTresDiasUteis(),
       })
       .eq("id", ativo.id);

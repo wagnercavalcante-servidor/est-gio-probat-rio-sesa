@@ -1,3 +1,4 @@
+import { PRAZOS_LEGAIS, prazoFinalDiasUteis, decidirTransicao, ErroDominio, type AcaoFluxo } from "@/domain";
 import type { TipoFormulario } from "@/lib/formularios";
 
 export type StatusFluxo =
@@ -53,15 +54,19 @@ export type RegistroFormulario = {
 
 /** Prazo de resposta: 3 dias úteis a contar de hoje, até as 23h59. */
 export function prazoTresDiasUteis(inicio = new Date()): string {
-  const data = new Date(inicio.getTime());
-  let uteis = 0;
-  while (uteis < 3) {
-    data.setDate(data.getDate() + 1);
-    const dia = data.getDay();
-    if (dia !== 0 && dia !== 6) uteis += 1;
+  return prazoFinalDiasUteis(inicio, PRAZOS_LEGAIS.pedidoReconsideracao);
+}
+
+/** Valida a ação pelas regras do domínio; retorna o próximo status ou a mensagem de bloqueio. */
+export function validarAcao(
+  r: Pick<RegistroFormulario, "status" | "prazo_resposta" | "resposta_em">,
+  acao: AcaoFluxo,
+): { ok: true; proximo: StatusFluxo } | { ok: false; erro: string } {
+  try {
+    return { ok: true, proximo: decidirTransicao(r.status, acao, { prazoResposta: r.prazo_resposta, respostaEm: r.resposta_em }) };
+  } catch (e) {
+    return { ok: false, erro: e instanceof ErroDominio ? e.message : "Ação não permitida." };
   }
-  data.setHours(23, 59, 0, 0);
-  return data.toISOString();
 }
 
 export function formatarPrazo(valor?: string | null): string {
