@@ -5,6 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatarData } from "@/lib/formularios";
 import { useSessao } from "@/hooks/useSessao";
+import { useServerFn } from "@tanstack/react-start";
+import { sincronizarServidores } from "@/lib/servidores-sync.functions";
+
+/** Período da N-ª avaliação: da data anterior (ou início do exercício) até a data do ciclo N. */
+export function periodoDaAvaliacao(s: Servidor | null, numero: number): { inicio: string; fim: string } | null {
+  if (!s?.datas_avaliacoes || numero < 1 || numero > 6) return null;
+  const fim = s.datas_avaliacoes[numero - 1];
+  const inicio = numero === 1 ? s.data_inicio_exercicio : s.datas_avaliacoes[numero - 2];
+  if (!fim || !inicio) return null;
+  return { inicio: formatarData(inicio), fim: formatarData(fim) };
+}
 
 export type Servidor = {
   id: string;
@@ -13,13 +24,22 @@ export type Servidor = {
   orgao: string;
   cargo: string | null;
   data_inicio_exercicio: string | null;
+  datas_avaliacoes: (string | null)[] | null;
 };
+
+let sincronizacao: Promise<unknown> | null = null;
 
 export function ServidorSelect({ aoSelecionar }: { aoSelecionar: (s: Servidor) => void }) {
   const [termo, setTermo] = useState("");
   const [resultados, setResultados] = useState<Servidor[]>([]);
   const [aberto, setAberto] = useState(false);
   const { orgao } = useSessao();
+  const sincronizar = useServerFn(sincronizarServidores);
+
+  useEffect(() => {
+    // Atualiza a base de servidores a partir da planilha uma vez por sessão.
+    if (!sincronizacao) sincronizacao = sincronizar().catch((e) => console.error(e));
+  }, [sincronizar]);
 
   useEffect(() => {
     if (termo.trim().length < 3) {
@@ -27,9 +47,10 @@ export function ServidorSelect({ aoSelecionar }: { aoSelecionar: (s: Servidor) =
       return;
     }
     const timer = setTimeout(async () => {
+      if (sincronizacao) await sincronizacao;
       let consulta = supabase
         .from("servidores")
-        .select("id, nome, matricula, orgao, cargo, data_inicio_exercicio")
+        .select("id, nome, matricula, orgao, cargo, data_inicio_exercicio, datas_avaliacoes")
         .or(`nome.ilike.%${termo.trim()}%,matricula.ilike.%${termo.trim()}%`);
       if (orgao) consulta = consulta.eq("orgao", orgao);
       const { data } = await consulta.order("nome").limit(12);
