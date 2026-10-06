@@ -1,2 +1,0 @@
-REVOKE EXECUTE ON FUNCTION public.update_updated_at_column() FROM PUBLIC, anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.prazo_etapa(text, integer, public.etapa_avaliacao) FROM PUBLIC, anon, authenticated;
