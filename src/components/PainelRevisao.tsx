@@ -9,7 +9,7 @@ import { Bloco, CampoArea } from "@/components/Campos";
 import { DocumentoFormulario } from "@/components/DocumentoFormulario";
 import { PONTUACAO_MAXIMA, REQUISITOS, TIPOS, somaNotas } from "@/lib/formularios";
 import { AlternarTestes } from "@/components/AlternarTestes";
-import { COLUNAS_FORMULARIO, prazoTresDiasUteis, type RegistroFormulario } from "@/lib/fluxo";
+import { COLUNAS_FORMULARIO, prazoTresDiasUteis, validarAcao, type RegistroFormulario } from "@/lib/fluxo";
 
 export function PainelRevisao({ userId }: { userId: string }) {
   const [registros, setRegistros] = useState<RegistroFormulario[]>([]);
@@ -59,6 +59,11 @@ export function PainelRevisao({ userId }: { userId: string }) {
 
   const enviar = async () => {
     if (!ativo || !revisao) return;
+    const v = validarAcao(ativo, "revisar");
+    if (!v.ok) {
+      toast.error(v.erro);
+      return;
+    }
     setSalvando(true);
     const { error } = await supabase
       .from("formularios")
@@ -66,7 +71,7 @@ export function PainelRevisao({ userId }: { userId: string }) {
         dados_revisao: revisao,
         revisado_em: new Date().toISOString(),
         pontuacao: total,
-        status: "aguardando_servidor_revisao",
+        status: v.proximo,
         prazo_resposta: prazoTresDiasUteis(),
       })
       .eq("id", ativo.id);

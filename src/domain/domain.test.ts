@@ -60,3 +60,17 @@ describe("RecursoRaep", () => {
     expect(() => r.prorrogar("de novo")).toThrow(/uma prorrogação/);
   });
 });
+
+import { decidirTransicao } from "./fluxo/FluxoAvaliacao";
+describe("FluxoAvaliacao", () => {
+  it("valida transições e prazos", () => {
+    expect(decidirTransicao("aguardando_servidor", "discordar")).toBe("em_revisao");
+    expect(() => decidirTransicao("em_revisao", "homologar")).toThrow();
+    expect(() =>
+      decidirTransicao("aguardando_servidor", "concordar", { prazoResposta: "2026-01-01T00:00:00Z", agora: new Date("2026-02-01") }),
+    ).toThrow(/encerrado/);
+    expect(() =>
+      decidirTransicao("aguardando_recurso", "protocolar_recurso", { respostaEm: "2026-03-02T12:00:00Z", agora: new Date("2026-03-20") }),
+    ).toThrow(/Preclusão/);
+  });
+});

@@ -10,7 +10,7 @@ import { TIPOS } from "@/lib/formularios";
 import { AssinaturaEletronica } from "@/components/AssinaturaEletronica";
 import { useAssinaturas } from "@/hooks/useAssinaturas";
 import { AlternarTestes } from "@/components/AlternarTestes";
-import { COLUNAS_FORMULARIO, ROTULO_STATUS, type RegistroFormulario } from "@/lib/fluxo";
+import { COLUNAS_FORMULARIO, ROTULO_STATUS, validarAcao, type RegistroFormulario } from "@/lib/fluxo";
 
 const homologacaoInicial = {
   discorda: "nao",
@@ -85,6 +85,11 @@ export function PainelComissao() {
 
   const homologar = async () => {
     if (!ativo) return;
+    const v = validarAcao(ativo, "homologar");
+    if (!v.ok) {
+      toast.error(v.erro);
+      return;
+    }
     setSalvando(true);
     const { error } = await supabase
       .from("formularios")
@@ -92,7 +97,7 @@ export function PainelComissao() {
         homologacao: h,
         homologado_em: new Date().toISOString(),
         homologado_por: (await supabase.auth.getUser()).data.user?.id ?? null,
-        status: "homologado",
+        status: v.proximo,
       })
       .eq("id", ativo.id);
     setSalvando(false);

@@ -15,6 +15,7 @@ import {
   ROTULO_STATUS,
   formatarPrazo,
   type RegistroFormulario,
+  validarAcao,
 } from "@/lib/fluxo";
 
 export function PainelServidor({ userId }: { userId: string }) {
@@ -51,7 +52,12 @@ export function PainelServidor({ userId }: { userId: string }) {
 
   const responder = async (r: RegistroFormulario, concorda: boolean) => {
     const revisao = r.status === "aguardando_servidor_revisao";
-    const novoStatus = concorda ? "aguardando_homologacao" : revisao ? "aguardando_recurso" : "em_revisao";
+    const v = validarAcao(r, concorda ? "concordar" : "discordar");
+    if (!v.ok) {
+      toast.error(v.erro);
+      return;
+    }
+    const novoStatus = v.proximo;
     const { error } = await supabase
       .from("formularios")
       .update({
